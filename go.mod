@@ -1,4 +1,4 @@
-module gola-utils
+module github.com/gola-glitch/gola-utils
 
 go 1.13
 
