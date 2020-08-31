@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"gola-utils/constants"
+	"github.com/gola-glitch/gola-utils/constants"
 	"net/http"
 	"net/http/httptest"
 	"testing"

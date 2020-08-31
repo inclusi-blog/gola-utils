@@ -2,7 +2,7 @@ package logging
 
 import (
 	"context"
-	"gola-utils/constants"
+	"github.com/gola-glitch/gola-utils/constants"
 
 	"github.com/gin-gonic/gin"
 )

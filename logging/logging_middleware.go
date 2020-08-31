@@ -2,7 +2,7 @@ package logging
 
 import (
 	"github.com/gin-gonic/gin"
-	"gola-utils/constants"
+	"github.com/gola-glitch/gola-utils/constants"
 )
 
 func LoggingMiddleware(entry *golaLoggerEntry) gin.HandlerFunc {

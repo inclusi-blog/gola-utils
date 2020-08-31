@@ -8,4 +8,5 @@ const (
 	NO_TRACE_ID                    = "no-trace-id"
 	JSON                           = "json"
 	TRACING_SESSION_HEADER_KEY     = "Session-Tracing-ID"
+	TRACE_CONFIG_MAX_ANNOTATIONS   = 128
 )
