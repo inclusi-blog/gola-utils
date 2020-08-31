@@ -29,14 +29,10 @@ cloud.google.com/go/storage v1.5.0/go.mod h1:tpKbwo567HUNpVclU5sGELwQWBDZ8gh0Zeo
 cloud.google.com/go/storage v1.6.0/go.mod h1:N7U0C8pVQ/+NIKOBQyamJIeKQKkZ+mxpohlUTyfDhBk=
 cloud.google.com/go/storage v1.8.0/go.mod h1:Wv1Oy7z6Yz3DshWRJFhqM/UCfaWIRTdp0RXyy7KQOVs=
 cloud.google.com/go/storage v1.10.0/go.mod h1:FLPqc6j+Ki4BU591ie1oL6qBQGu2Bl/tZ9ullr3+Kg0=
-contrib.go.opencensus.io/exporter/ocagent v0.7.0 h1:BEfdCTXfMV30tLZD8c9n64V/tIZX5+9sXiuFLnrr1k8=
-contrib.go.opencensus.io/exporter/ocagent v0.7.0/go.mod h1:IshRmMJBhDfFj5Y67nVhMYTTIze91RUeT73ipWKs/GY=
 contrib.go.opencensus.io/exporter/ocagent v0.7.1-0.20200812142813-b599b1f9e024 h1:5cNhCcqI+zxSDzvlrBs5ElPkpi4VuScHHDAS0qQdq4c=
 contrib.go.opencensus.io/exporter/ocagent v0.7.1-0.20200812142813-b599b1f9e024/go.mod h1:IshRmMJBhDfFj5Y67nVhMYTTIze91RUeT73ipWKs/GY=
 contrib.go.opencensus.io/integrations/ocsql v0.1.5 h1:ldKJwGOMJlUB+o//H2Nz1GDiHd8qb8fXfZJxBChce0A=
 contrib.go.opencensus.io/integrations/ocsql v0.1.5/go.mod h1:8DsSdjz3F+APR+0z0WkU1aRorQCFfRxvqjUUPMbF3fE=
-contrib.go.opencensus.io/integrations/ocsql v0.1.6 h1:9qmZJBlnMtffShflmfhW4EZK7M+CujIDG4bEwUrg+ms=
-contrib.go.opencensus.io/integrations/ocsql v0.1.6/go.mod h1:8DsSdjz3F+APR+0z0WkU1aRorQCFfRxvqjUUPMbF3fE=
 dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7gZCb22OMCxBHrMx7a5I7Hp++hsVxbQ4BYO7hU=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
@@ -445,6 +441,10 @@ gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8
 gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 h1:qIbj1fsPNlZgppZ+VLlY7N33q108Sa+fhmuc+sWQYwY=
 gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/errgo.v2 v2.1.0/go.mod h1:hNsd1EY+bozCKY1Ytp96fpM3vjJbqLJn88ws8XvfDNI=
+gopkg.in/go-playground/assert.v1 v1.2.1 h1:xoYuJVE7KT85PYWrN730RguIQO0ePzVRfFMXadIrXTM=
+gopkg.in/go-playground/assert.v1 v1.2.1/go.mod h1:9RXL0bg/zibRAgZUYszZSwO/z8Y/a8bDuhia5mkpMnE=
+gopkg.in/go-playground/validator.v9 v9.31.0 h1:bmXmP2RSNtFES+bn4uYuHT7iJFJv7Vj+an+ZQdDaD1M=
+gopkg.in/go-playground/validator.v9 v9.31.0/go.mod h1:+c9/zcJMFNgbLvly1L1V+PpxWdVbfP1avr/N00E2vyQ=
 gopkg.in/yaml.v2 v2.2.2/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 gopkg.in/yaml.v2 v2.2.3/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 gopkg.in/yaml.v2 v2.2.8 h1:obN1ZagJSUGI0Ek/LBmuj4SNLPfIny3KsKFopxRdj10=

@@ -18,4 +18,6 @@ require (
 	google.golang.org/api v0.30.0 // indirect
 	google.golang.org/genproto v0.0.0-20200831141814-d751682dd103 // indirect
 	google.golang.org/grpc v1.31.1 // indirect
+	gopkg.in/go-playground/assert.v1 v1.2.1 // indirect
+	gopkg.in/go-playground/validator.v9 v9.31.0
 )
