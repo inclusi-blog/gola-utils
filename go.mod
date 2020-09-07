@@ -8,6 +8,7 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
 	github.com/gin-gonic/gin v1.6.3
+	github.com/golang/mock v1.4.3
 	github.com/google/go-cmp v0.5.1 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.14.7 // indirect
 	github.com/jmoiron/sqlx v1.2.0
