@@ -34,24 +34,6 @@ type dummyRequest struct {
 	FieldB float64 `json:"fieldB"`
 }
 
-type headerField struct {
-	MessageId string `json:"msgId"`
-	AppId     string `json:"appId"`
-}
-
-type from struct {
-	Id string `json:"id"`
-}
-
-type dummyEsbRequest struct {
-	HeaderField headerField `json:"headerField"`
-}
-
-type dummyEsbRequestV2 struct {
-	HeaderField headerField `json:"headerField"`
-	From        from        `json:"from"`
-}
-
 type dummyResponse struct {
 	ResponseFieldA string `json:"responseFieldA" validate:"required"`
 }
@@ -100,10 +82,6 @@ type HttpRequestTestSuite struct {
 	httpRequestBuilder HttpRequestBuilder
 	requestBody        dummyRequest
 	requestBodyAsBytes []byte
-	esbRequest         dummyEsbRequest
-	esbRequestV2       dummyEsbRequestV2
-	esbRequestBytes    []byte
-	esbRequestBytesV2  []byte
 	XMLRequestBody     dummyXMLRequest
 	url                string
 	trace              *traceMocks.MockTrace
@@ -117,12 +95,6 @@ func (suite *HttpRequestTestSuite) SetupTest() {
 	suite.url = "http://dummyurl.com"
 	suite.requestBody = dummyRequest{FieldA: "sample value"}
 	suite.requestBodyAsBytes, _ = json.Marshal(suite.requestBody)
-	suite.esbRequest.HeaderField.MessageId = "some-message-id"
-	suite.esbRequestBytes, _ = json.Marshal(suite.esbRequest)
-	suite.esbRequestV2.HeaderField.MessageId = "some-message-id"
-	suite.esbRequestV2.HeaderField.AppId = "some-app-id"
-	suite.esbRequestV2.From.Id = "some-from-id"
-	suite.esbRequestBytesV2, _ = json.Marshal(suite.esbRequestV2)
 	suite.XMLRequestBody = dummyXMLRequest{
 		XMLName: xml.Name{},
 		FieldA:  "A",

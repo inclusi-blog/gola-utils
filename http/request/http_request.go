@@ -33,9 +33,6 @@ import (
 
 const (
 	ErrorTraceAttribute = "error"
-	ESB_WEB_APP_ID      = "OPW"
-	ESB_MOBILE_APP_ID   = "OPM"
-	ESB_COMMON_APP_ID   = "OPT"
 )
 
 type HttpRequest interface {
