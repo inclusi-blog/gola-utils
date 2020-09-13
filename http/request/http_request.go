@@ -584,8 +584,8 @@ func (rb requestBuilder) NewRequest() HttpRequest {
 		headers: map[string]string{
 			constants.X_REQUESTED_WITH_HEADER_KEY: constants.X_REQUESTED_WITH_HEADER_VALUE,
 		},
-		cookies:         []*http.Cookie{},
-		trace:           trace.New(),
+		cookies: []*http.Cookie{},
+		trace:   trace.New(),
 	}
 }
 

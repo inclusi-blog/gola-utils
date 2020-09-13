@@ -26,5 +26,5 @@ const (
 	CONTEXT_ENC_ID_TOKEN          = "encIdToken"
 	HeaderContentType             = "Content-Type"
 	COOKIE_ACCESS_TOKEN           = "access_token"
-	COOKIE_ENC_ID_TOKEN            = "enc_id_token"
+	COOKIE_ENC_ID_TOKEN           = "enc_id_token"
 )
