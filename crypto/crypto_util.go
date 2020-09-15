@@ -1,0 +1,47 @@
+package crypto
+
+import (
+	"errors"
+	"github.com/gin-gonic/gin"
+	"github.com/gola-glitch/gola-utils/constants"
+	"github.com/gola-glitch/gola-utils/http/request"
+	"github.com/gola-glitch/gola-utils/http/util"
+	"github.com/gola-glitch/gola-utils/model"
+)
+
+type CryptoUtil interface {
+	Decipher(ctx *gin.Context, encryptedText string) (string, error)
+}
+
+func NewCryptoUtil(cryptoServiceUrl string) CryptoUtil {
+	return cryptoUtil{
+		httpRequestBuilder: request.NewHttpRequestBuilder(util.GetHttpClientWithTracing()),
+		cryptoServiceUrl:   cryptoServiceUrl,
+	}
+}
+
+type cryptoUtil struct {
+	httpRequestBuilder request.HttpRequestBuilder
+	cryptoServiceUrl   string
+}
+
+func (utils cryptoUtil) Decipher(ctx *gin.Context, encryptedText string) (string, error) {
+	if encryptedText == "" {
+		return "", errors.New("text is empty")
+	}
+
+	response := &model.CryptoResponse{}
+
+	url := utils.cryptoServiceUrl + constants.TEXT_DECRYPT_ROUTE
+	err := utils.httpRequestBuilder.
+		NewRequest().
+		WithContext(ctx).
+		WithJSONBody(model.CryptoRequest{EncryptedText: encryptedText}).
+		ResponseAs(response).
+		Post(url)
+	if err != nil {
+		return "", err
+	}
+
+	return response.DecryptedText, nil
+}

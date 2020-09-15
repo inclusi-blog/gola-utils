@@ -27,4 +27,6 @@ const (
 	HeaderContentType             = "Content-Type"
 	COOKIE_ACCESS_TOKEN           = "access_token"
 	COOKIE_ENC_ID_TOKEN           = "enc_id_token"
+
+	TEXT_DECRYPT_ROUTE         = "/api/crypto/decrypt"
 )
