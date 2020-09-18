@@ -6,8 +6,10 @@ require (
 	contrib.go.opencensus.io/exporter/ocagent v0.7.1-0.20200812142813-b599b1f9e024
 	contrib.go.opencensus.io/integrations/ocsql v0.1.5
 	github.com/DATA-DOG/go-sqlmock v1.5.0
+	github.com/alicebob/miniredis/v2 v2.13.3
 	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
 	github.com/gin-gonic/gin v1.6.3
+	github.com/go-redis/redis/v7 v7.4.0
 	github.com/golang/mock v1.4.3
 	github.com/google/go-cmp v0.5.1 // indirect
 	github.com/grpc-ecosystem/grpc-gateway v1.14.7 // indirect
