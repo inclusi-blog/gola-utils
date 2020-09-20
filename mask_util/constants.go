@@ -8,5 +8,5 @@ const (
 )
 
 const (
-	Email         MaskFieldKeyType = "email"
+	Email MaskFieldKeyType = "email"
 )
