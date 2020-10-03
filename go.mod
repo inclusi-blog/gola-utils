@@ -8,6 +8,7 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/alicebob/miniredis/v2 v2.13.3
 	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-redis/redis/v7 v7.4.0
 	github.com/golang/mock v1.4.3

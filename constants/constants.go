@@ -29,6 +29,8 @@ const (
 	COOKIE_ENC_ID_TOKEN           = "enc_id_token"
 
 	TEXT_DECRYPT_ROUTE = "/api/crypto/decrypt"
+	TOKEN_DECRYPT_ROUTE = "/api/crypto/id-token/decrypt"
+	TOKEN_ENCRYPT_ROUTE = "/api/crypto/id-token/encrypt"
 
 	REDIS_SCAN_DEAFULT_CURSOR_VALUE = 0
 	REDIS_SCAN_DEFAULT_COUNT        = 1000

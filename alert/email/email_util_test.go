@@ -170,8 +170,8 @@ func getEncodeMailContentWithBaseTemplate() string {
 
 func getEmailDetails() models.EmailDetails {
 	sampleHTML := `<p>Today is a sunny day</p>`
-	fromID := "no-reply@idfcbank.com"
-	toIDs := []string{"john@idfcbank.com"}
+	fromID := "no-reply@gola.xyz"
+	toIDs := []string{"john@gmail.com"}
 	subject := "Test Subject"
 	emailData := models.EmailDetails{
 		From:    fromID,
