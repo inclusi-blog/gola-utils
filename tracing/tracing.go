@@ -18,9 +18,9 @@ import (
 )
 
 var (
-	RegisterOracleDriverWithInstrumentationFunc = RegisterOracleDriverWithInstrumentation
-	OpenDbConnectionFunc                        = OpenDbConnection
-	SqlOpenFunc                                 = sql.Open
+	RegisterPostgresDriverWithInstrumentationFunc = RegisterPostgresDriverWithInstrumentation
+	OpenDbConnectionFunc                          = OpenDbConnection
+	SqlOpenFunc                                   = sql.Open
 )
 
 func Init(serviceName string, ocAgent string) *ocagent.Exporter {
@@ -54,9 +54,9 @@ func WithTracing(app http.Handler, healthz string) http.Handler {
 		}}
 }
 
-func InitSqlOracleDBWithInstrumentation(driverName, conn string) (*sql.DB, error) {
+func InitSqlPostgresDBWithInstrumentation(driverName, conn string) (*sql.DB, error) {
 	logger := logging.NewLoggerEntry()
-	if err := RegisterOracleDriverWithInstrumentationFunc(driverName, conn); err != nil {
+	if err := RegisterPostgresDriverWithInstrumentationFunc(driverName, conn); err != nil {
 		logger.Error("error while registering driver with tracing instrumentation ", err.Error())
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func InitSqlOracleDBWithInstrumentation(driverName, conn string) (*sql.DB, error
 	return db, nil
 }
 
-func RegisterOracleDriverWithInstrumentation(driverName, conn string) error {
+func RegisterPostgresDriverWithInstrumentation(driverName, conn string) error {
 	logger := logging.NewLoggerEntry()
 	db, dbErr := SqlOpenFunc(driverName, conn)
 	if dbErr != nil {
@@ -117,9 +117,9 @@ func addTracingOptions(db *sql.DB, driverName string) {
 	}
 }
 
-// can be used for default custom config of oracle
-func InitSqlxOracleDBWithInstrumentation(driverName, conn string) (*sqlx.DB, error) {
-	err := RegisterOracleDriverWithInstrumentationFunc(driverName, conn)
+// can be used for default custom config of postgres
+func InitPostgresDBWithInstrumentation(driverName, conn string) (*sqlx.DB, error) {
+	err := RegisterPostgresDriverWithInstrumentationFunc(driverName, conn)
 	if err != nil {
 		return nil, err
 	}
@@ -130,8 +130,8 @@ func InitSqlxOracleDBWithInstrumentation(driverName, conn string) (*sqlx.DB, err
 	return sqlx.NewDb(db, driverName), nil
 }
 
-func InitSqlxOracleDBWithInstrumentationAndConnectionConfig(driverName, conn string, dbConnectionPoolConfig model.DBConnectionPoolConfig) (*sqlx.DB, error) {
-	err := RegisterOracleDriverWithInstrumentationFunc(driverName, conn)
+func InitPostgresDBWithInstrumentationAndConnectionConfig(driverName, conn string, dbConnectionPoolConfig model.DBConnectionPoolConfig) (*sqlx.DB, error) {
+	err := RegisterPostgresDriverWithInstrumentationFunc(driverName, conn)
 	if err != nil {
 		return nil, err
 	}

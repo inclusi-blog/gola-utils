@@ -18,7 +18,7 @@ func TestTracingTestSuite(t *testing.T) {
 }
 
 func (suite *TracingTestSuite) TearDownTest() {
-	RegisterOracleDriverWithInstrumentationFunc = RegisterOracleDriverWithInstrumentation
+	RegisterPostgresDriverWithInstrumentationFunc = RegisterPostgresDriverWithInstrumentation
 	OpenDbConnectionFunc = OpenDbConnection
 	SqlOpenFunc = sql.Open
 }
@@ -56,46 +56,46 @@ func (suite *TracingTestSuite) TestOpenConnectionShouldReturnErrorWhenPingFails(
 	db.Close()
 }
 
-func (suite *TracingTestSuite) TestRegisterOracleDriverWithInstrumentation() {
+func (suite *TracingTestSuite) TestRegisterPostgresDriverWithInstrumentation() {
 	db, mock, _ := sqlmock.NewWithDSN("sqlmock_db_0", sqlmock.MonitorPingsOption(true))
 	SqlOpenFunc = func(string2 string, string3 string) (*sql.DB, error) {
 		return db, nil
 	}
 	mock.ExpectClose()
-	dbErr := RegisterOracleDriverWithInstrumentation("mock", "sqlmock_db_0")
+	dbErr := RegisterPostgresDriverWithInstrumentation("mock", "sqlmock_db_0")
 	suite.Nil(dbErr)
 }
 
-func (suite *TracingTestSuite) TestRegisterOracleDriverWithInstrumentationShouldFailWhenUnableToOpenConnection() {
+func (suite *TracingTestSuite) TestRegisterPostgresDriverWithInstrumentationShouldFailWhenUnableToOpenConnection() {
 	err := errors.New("unable to open connection")
 	SqlOpenFunc = func(string2 string, string3 string) (*sql.DB, error) {
 		return nil, err
 	}
-	dbErr := RegisterOracleDriverWithInstrumentation("mock", "sqlmock_db_0")
+	dbErr := RegisterPostgresDriverWithInstrumentation("mock", "sqlmock_db_0")
 	suite.Equal(err, dbErr)
 }
 
-func (suite *TracingTestSuite) TestRegisterOracleDriverWithInstrumentationShouldFailWhenUnableToCloseConnection() {
+func (suite *TracingTestSuite) TestRegisterPostgresDriverWithInstrumentationShouldFailWhenUnableToCloseConnection() {
 	db, mock, _ := sqlmock.NewWithDSN("sqlmock_db_0", sqlmock.MonitorPingsOption(true))
 	SqlOpenFunc = func(string2 string, string3 string) (*sql.DB, error) {
 		return db, nil
 	}
 	err := errors.New("unable to close connection")
 	mock.ExpectClose().WillReturnError(err)
-	dbErr := RegisterOracleDriverWithInstrumentation("mock", "sqlmock_db_0")
+	dbErr := RegisterPostgresDriverWithInstrumentation("mock", "sqlmock_db_0")
 	suite.Equal(err, dbErr)
 	db.Close()
 }
 
-func (suite *TracingTestSuite) TestInitSqlxOracleDBWithInstrumentationAndConnectionConfigSuccessfully() {
+func (suite *TracingTestSuite) TestInitPostgresDBWithInstrumentationAndConnectionConfigSuccessfully() {
 	db, _, _ := sqlmock.NewWithDSN("sqlmock_db_0", sqlmock.MonitorPingsOption(true))
-	RegisterOracleDriverWithInstrumentationFunc = func(string2 string, string3 string) error {
+	RegisterPostgresDriverWithInstrumentationFunc = func(string2 string, string3 string) error {
 		return nil
 	}
 	OpenDbConnectionFunc = func(string2 string, string3 string) (*sql.DB, error) {
 		return db, nil
 	}
-	dbConn, err := InitSqlxOracleDBWithInstrumentationAndConnectionConfig("mock",
+	dbConn, err := InitPostgresDBWithInstrumentationAndConnectionConfig("mock",
 		"sqlmock_db_0", model.DBConnectionPoolConfig{
 			MaxOpenConnections:             1,
 			MaxIdleConnections:             2,
@@ -107,103 +107,103 @@ func (suite *TracingTestSuite) TestInitSqlxOracleDBWithInstrumentationAndConnect
 	dbConn.Close()
 }
 
-func (suite *TracingTestSuite) TestInitSqlxOracleDBWithInstrumentationAndConnectionConfigShouldGiveErrorWhenUnableToRegisterOracleDriverWithInstrumentation() {
+func (suite *TracingTestSuite) TestInitPostgresDBWithInstrumentationAndConnectionConfigShouldGiveErrorWhenUnableToRegisterPostgresDriverWithInstrumentation() {
 	dbErr := errors.New("unable to register")
-	RegisterOracleDriverWithInstrumentationFunc = func(string2 string, string3 string) error {
+	RegisterPostgresDriverWithInstrumentationFunc = func(string2 string, string3 string) error {
 		return dbErr
 	}
-	dbConn, err := InitSqlxOracleDBWithInstrumentationAndConnectionConfig("mock",
+	dbConn, err := InitPostgresDBWithInstrumentationAndConnectionConfig("mock",
 		"sqlmock_db_0", model.DBConnectionPoolConfig{})
 	suite.Nil(dbConn)
 	suite.Equal(dbErr, err)
 }
 
-func (suite *TracingTestSuite) TestInitSqlxOracleDBWithInstrumentationAndConnectionConfigShouldGiveErrorWhenUnableToOpenDBConnection() {
+func (suite *TracingTestSuite) TestInitPostgresDBWithInstrumentationAndConnectionConfigShouldGiveErrorWhenUnableToOpenDBConnection() {
 	dbErr := errors.New("unable to open db connection")
-	RegisterOracleDriverWithInstrumentationFunc = func(string2 string, string3 string) error {
+	RegisterPostgresDriverWithInstrumentationFunc = func(string2 string, string3 string) error {
 		return nil
 	}
 	OpenDbConnectionFunc = func(string2 string, string3 string) (*sql.DB, error) {
 		return nil, dbErr
 	}
-	dbConn, err := InitSqlxOracleDBWithInstrumentationAndConnectionConfig("mock",
+	dbConn, err := InitPostgresDBWithInstrumentationAndConnectionConfig("mock",
 		"sqlmock_db_0", model.DBConnectionPoolConfig{})
 	suite.Equal(dbErr, err)
 	suite.Nil(dbConn)
 }
 
-func (suite *TracingTestSuite) TestInitSqlxOracleDBWithInstrumentationSuccessfully() {
+func (suite *TracingTestSuite) TestInitPostgresDBWithInstrumentationSuccessfully() {
 	db, _, _ := sqlmock.NewWithDSN("sqlmock_db_0", sqlmock.MonitorPingsOption(true))
-	RegisterOracleDriverWithInstrumentationFunc = func(string2 string, string3 string) error {
+	RegisterPostgresDriverWithInstrumentationFunc = func(string2 string, string3 string) error {
 		return nil
 	}
 	OpenDbConnectionFunc = func(string2 string, string3 string) (*sql.DB, error) {
 		return db, nil
 	}
-	dbConn, err := InitSqlxOracleDBWithInstrumentation("mock", "sqlmock_db_0")
+	dbConn, err := InitPostgresDBWithInstrumentation("mock", "sqlmock_db_0")
 	suite.Nil(err)
 	suite.NotNil(dbConn)
 	db.Close()
 	dbConn.Close()
 }
 
-func (suite *TracingTestSuite) TestInitSqlxOracleDBWithInstrumentationShouldGiveErrorWhenUnableToRegisterOracleDriverWithInstrumentation() {
+func (suite *TracingTestSuite) TestInitPostgresDBWithInstrumentationShouldGiveErrorWhenUnableToRegisterPostgresDriverWithInstrumentation() {
 	dbErr := errors.New("unable to register")
-	RegisterOracleDriverWithInstrumentationFunc = func(string2 string, string3 string) error {
+	RegisterPostgresDriverWithInstrumentationFunc = func(string2 string, string3 string) error {
 		return dbErr
 	}
-	dbConn, err := InitSqlxOracleDBWithInstrumentation("mock", "sqlmock_db_0")
+	dbConn, err := InitPostgresDBWithInstrumentation("mock", "sqlmock_db_0")
 	suite.Nil(dbConn)
 	suite.Equal(dbErr, err)
 }
 
-func (suite *TracingTestSuite) TestInitSqlxOracleDBWithInstrumentationShouldGiveErrorWhenUnableToOpenDBConnection() {
+func (suite *TracingTestSuite) TestInitPostgresDBWithInstrumentationShouldGiveErrorWhenUnableToOpenDBConnection() {
 	dbErr := errors.New("unable to open db connection")
-	RegisterOracleDriverWithInstrumentationFunc = func(string2 string, string3 string) error {
+	RegisterPostgresDriverWithInstrumentationFunc = func(string2 string, string3 string) error {
 		return nil
 	}
 	OpenDbConnectionFunc = func(string2 string, string3 string) (*sql.DB, error) {
 		return nil, dbErr
 	}
-	dbConn, err := InitSqlxOracleDBWithInstrumentation("mock", "sqlmock_db_0")
+	dbConn, err := InitPostgresDBWithInstrumentation("mock", "sqlmock_db_0")
 	suite.Equal(dbErr, err)
 	suite.Nil(dbConn)
 }
 
-func (suite *TracingTestSuite) TestInitSqlOracleDBWithInstrumentationShouldOpenConnectionSuccessfully() {
+func (suite *TracingTestSuite) TestInitSqlPostgresDBWithInstrumentationShouldOpenConnectionSuccessfully() {
 	db, _, _ := sqlmock.NewWithDSN("sqlmock_db_0", sqlmock.MonitorPingsOption(true))
-	RegisterOracleDriverWithInstrumentationFunc = func(string2 string, string3 string) error {
+	RegisterPostgresDriverWithInstrumentationFunc = func(string2 string, string3 string) error {
 		return nil
 	}
 	OpenDbConnectionFunc = func(string2 string, string3 string) (*sql.DB, error) {
 		return db, nil
 	}
-	dbConn, err := InitSqlOracleDBWithInstrumentation("mock", "sqlmock_db_0")
+	dbConn, err := InitSqlPostgresDBWithInstrumentation("mock", "sqlmock_db_0")
 	suite.Nil(err)
 	suite.NotNil(dbConn)
 	db.Close()
 	dbConn.Close()
 }
 
-func (suite *TracingTestSuite) TestInitSqlOracleDBWithInstrumentationShouldReturnErrorWhenRegisterTracingFails() {
+func (suite *TracingTestSuite) TestInitSqlPostgresDBWithInstrumentationShouldReturnErrorWhenRegisterTracingFails() {
 	dbErr := errors.New("unable to register")
-	RegisterOracleDriverWithInstrumentationFunc = func(string2 string, string3 string) error {
+	RegisterPostgresDriverWithInstrumentationFunc = func(string2 string, string3 string) error {
 		return dbErr
 	}
-	dbConn, err := InitSqlOracleDBWithInstrumentation("mock", "sqlmock_db_0")
+	dbConn, err := InitSqlPostgresDBWithInstrumentation("mock", "sqlmock_db_0")
 	suite.Equal(dbErr, err)
 	suite.Nil(dbConn)
 }
 
-func (suite *TracingTestSuite) TestInitSqlOracleDBWithInstrumentationShouldReturnErrorWhenOpenDBConnectionFails() {
+func (suite *TracingTestSuite) TestInitSqlPostgresDBWithInstrumentationShouldReturnErrorWhenOpenDBConnectionFails() {
 	dbErr := errors.New("unable to open db connection")
-	RegisterOracleDriverWithInstrumentationFunc = func(string2 string, string3 string) error {
+	RegisterPostgresDriverWithInstrumentationFunc = func(string2 string, string3 string) error {
 		return nil
 	}
 	OpenDbConnectionFunc = func(string2 string, string3 string) (*sql.DB, error) {
 		return nil, dbErr
 	}
-	dbConn, err := InitSqlOracleDBWithInstrumentation("mock", "sqlmock_db_0")
+	dbConn, err := InitSqlPostgresDBWithInstrumentation("mock", "sqlmock_db_0")
 	suite.Equal(dbErr, err)
 	suite.Nil(dbConn)
 }
