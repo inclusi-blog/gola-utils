@@ -7,5 +7,3 @@ type IdToken struct {
 	Subject         string `json:"subject"`
 	AccessTokenHash string `json:"at_hash"`
 }
-
-

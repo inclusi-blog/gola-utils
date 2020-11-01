@@ -28,7 +28,7 @@ const (
 	COOKIE_ACCESS_TOKEN           = "access_token"
 	COOKIE_ENC_ID_TOKEN           = "enc_id_token"
 
-	TEXT_DECRYPT_ROUTE = "/api/crypto/decrypt"
+	TEXT_DECRYPT_ROUTE  = "/api/crypto/decrypt"
 	TOKEN_DECRYPT_ROUTE = "/api/crypto/id-token/decrypt"
 	TOKEN_ENCRYPT_ROUTE = "/api/crypto/id-token/encrypt"
 

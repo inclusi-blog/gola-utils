@@ -97,7 +97,6 @@ func (suite OauthUtilsTestSuite) TestShouldReturnIdTokenForGivenValidJWETokenInG
 func (suite OauthUtilsTestSuite) TestShouldReturnIdTokenForGivenValidJWETokenInGoContext() {
 	jwtToken := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2MjA5NDNhMi1iYTUxLTQyMzEtODViMC1jYzExOWMxMDg0MGEiLCJ1c2VybmFtZSI6ImR1bW15LXVzZXIiLCJlbWFpbCI6ImR1bW15QGdtYWlsLmNvbSIsInN1YmplY3QiOiI2MjA5NDNhMi1iYTUxLTQyMzEtODViMC1jYzExOWMxMDg0MGEiLCJhdF9oYXNoIjoiejRyVmVWOUlEVzRtUUJnazgwRVBXZyJ9.u2OhPnr6UDFgZL7ggbbDv_wN7izPR7-yj1BQFzyxQVU"
 
-
 	ctx := context.WithValue(context.Background(), constants.CONTEXT_ENC_ID_TOKEN, jwtToken)
 	ctx = context.WithValue(ctx, constants.CONTEXT_ACCESS_TOKEN, "Glp4z8uis5TtrPXGDl2FQKYqNeaHgrhFlSLlLKvEd7U.ZsQVxn71lRB2QGHEJ94bS2aAKxUrSMj1CRMM6PtC4MY")
 
