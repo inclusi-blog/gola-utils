@@ -6,6 +6,7 @@ import (
 	"github.com/gola-glitch/gola-utils/constants"
 	"github.com/gola-glitch/gola-utils/logging"
 	"github.com/gola-glitch/gola-utils/model"
+	"github.com/sirupsen/logrus"
 	"net/http"
 	"time"
 
@@ -24,7 +25,7 @@ var (
 )
 
 func Init(serviceName string, ocAgent string) *ocagent.Exporter {
-	oce, _ := ocagent.NewExporter(
+	oce, err := ocagent.NewExporter(
 		ocagent.WithInsecure(),
 		ocagent.WithReconnectionPeriod(1*time.Second),
 		ocagent.WithAddress(ocAgent),
@@ -32,6 +33,9 @@ func Init(serviceName string, ocAgent string) *ocagent.Exporter {
 		ocagent.WithSpanConfig(ocagent.SpanConfig{
 			AnnotationEventsPerSpan: constants.TRACE_CONFIG_MAX_ANNOTATIONS,
 		}))
+	if err != nil {
+		logrus.Errorf("Error occurred while connecting to oc agent exporter %v", err)
+	}
 	trace.RegisterExporter(oce)
 	trace.ApplyConfig(trace.Config{
 		DefaultSampler:             trace.AlwaysSample(),
