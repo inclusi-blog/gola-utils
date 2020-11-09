@@ -24,7 +24,7 @@ var (
 	SqlOpenFunc                                   = sql.Open
 )
 
-func Init(serviceName string, ocAgent string) *ocagent.Exporter {
+func Init(serviceName string, ocAgent string) (*ocagent.Exporter, error) {
 	oce, err := ocagent.NewExporter(
 		ocagent.WithInsecure(),
 		ocagent.WithReconnectionPeriod(1*time.Second),
@@ -42,7 +42,7 @@ func Init(serviceName string, ocAgent string) *ocagent.Exporter {
 		MaxAnnotationEventsPerSpan: constants.TRACE_CONFIG_MAX_ANNOTATIONS,
 	})
 
-	return oce
+	return oce, err
 }
 
 func WithTracing(app http.Handler, healthz string) http.Handler {
