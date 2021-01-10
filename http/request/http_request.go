@@ -1,5 +1,7 @@
 package request
 
+//go:generate mockgen -source=http_request.go -destination=./mocks/mock_http_request.go -package=mocks
+
 import (
 	"bytes"
 	"context"
@@ -8,14 +10,18 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gola-glitch/gola-utils/http/util"
+	"github.com/jtacoma/uritemplates"
 	"io/ioutil"
 	"mime"
 	"mime/multipart"
 	"net/http"
 	"net/textproto"
+	"net/url"
 	"os"
 	"reflect"
+	"strconv"
 	"strings"
+	"time"
 
 	"gopkg.in/go-playground/validator.v9"
 
@@ -35,6 +41,8 @@ const (
 	ErrorTraceAttribute = "error"
 )
 
+type TraceHookFunc func([]byte) (string, error)
+
 type HttpRequest interface {
 	WithJSONBody(interface{}) HttpRequest
 	WithJSONBodyNoEscapeHTML(interface{}) HttpRequest
@@ -43,8 +51,11 @@ type HttpRequest interface {
 	WithFormURLEncoded(map[string]interface{}) HttpRequest
 	WithContext(context.Context) HttpRequest
 	WithOauth() HttpRequest
+	WithRequestBodyBytes([]byte) HttpRequest
 	WithTracer(trace.Trace) HttpRequest
 	WithCustomValidator(*validator.Validate) HttpRequest
+	RequestTraceHook(hookFunc TraceHookFunc) HttpRequest
+	ResponseTraceHook(hookFunc TraceHookFunc) HttpRequest
 	ResponseAs(interface{}) HttpRequest
 	ResponseStatusCodeAs(*int) HttpRequest
 	ResponseHeadersAs(*map[string][]string) HttpRequest
@@ -52,6 +63,7 @@ type HttpRequest interface {
 	AddHeader(string, string) HttpRequest
 	AddHeaders(map[string]string) HttpRequest
 	AddQueryParameters(map[string]string) HttpRequest
+	AddPathParameters(map[string]interface{}) HttpRequest
 	AddCookie(*http.Cookie) HttpRequest
 	Post(string) error
 	Put(string) error
@@ -73,9 +85,13 @@ type httpRequest struct {
 	requestBytes       []byte
 	requestBuildError  error
 	queryParameters    map[string]string
+	pathParameters     map[string]interface{}
+	pathTemplate       string
 	responseHeaders    *map[string][]string
 	enableTracing      bool
 	trace              trace.Trace
+	requestTraceHook   TraceHookFunc
+	responseTraceHook  TraceHookFunc
 }
 
 var quoteEscaper = strings.NewReplacer("\\", "\\\\", `"`, "\\\"")
@@ -86,6 +102,16 @@ func escapeQuotes(s string) string {
 
 func (r httpRequest) WithCustomValidator(validator *validator.Validate) HttpRequest {
 	r.validate = validator
+	return r
+}
+
+func (r httpRequest) RequestTraceHook(hookFunc TraceHookFunc) HttpRequest {
+	r.requestTraceHook = hookFunc
+	return r
+}
+
+func (r httpRequest) ResponseTraceHook(hookFunc TraceHookFunc) HttpRequest {
+	r.responseTraceHook = hookFunc
 	return r
 }
 
@@ -286,28 +312,48 @@ func (r httpRequest) AddQueryParameters(queryParameters map[string]string) HttpR
 	return r
 }
 
+func (r httpRequest) AddPathParameters(pathParameters map[string]interface{}) HttpRequest {
+	r.pathParameters = pathParameters
+	return r
+}
+
 func (r httpRequest) Get(url string) error {
-	return r.makeRequest("GET", url)
+	r.pathTemplate = url
+	return r.makeRequest("GET")
 }
 
 func (r httpRequest) Post(url string) error {
-	return r.makeRequest("POST", url)
+	r.pathTemplate = url
+	return r.makeRequest("POST")
 }
 
 func (r httpRequest) Put(url string) error {
-	return r.makeRequest("PUT", url)
+	r.pathTemplate = url
+	return r.makeRequest("PUT")
 }
 
 func (r httpRequest) Delete(url string) error {
-	return r.makeRequest("DELETE", url)
+	r.pathTemplate = url
+	return r.makeRequest("DELETE")
 }
 
-func (r httpRequest) makeRequest(method, url string) error {
+func (r httpRequest) makeRequest(method string) error {
 	if r.requestBuildError != nil {
 		return r.requestBuildError
 	}
 
-	httpRequest, requestError := http.NewRequest(method, url, bytes.NewBuffer(r.requestBytes))
+	cleanUrl, urlFormatErr := r.removeDoubleSlashesInUrl(r.pathTemplate)
+	if urlFormatErr != nil {
+		return urlFormatErr
+	}
+	r.pathTemplate = cleanUrl
+
+	urlWithPathParams, urlConstructionErr := r.getUrlWithPathParams()
+	if urlConstructionErr != nil {
+		return urlConstructionErr
+	}
+
+	httpRequest, requestError := http.NewRequest(method, urlWithPathParams, bytes.NewBuffer(r.requestBytes))
 
 	if requestError != nil {
 		return requestError
@@ -347,8 +393,13 @@ func (r httpRequest) makeRequest(method, url string) error {
 		dataSpan = r.logHttpRequest(span, httpRequest)
 		// defer span.End() Fixes span adjustment
 	}
+	start := time.Now()
 
 	response, httpError := r.httpClient.Do(httpRequest)
+
+	_ = time.Since(start)
+
+	_ = getStatusCode(response)
 
 	if response != nil && r.responseStatusCode != nil {
 		*r.responseStatusCode = response.StatusCode
@@ -403,6 +454,48 @@ func (r httpRequest) makeRequest(method, url string) error {
 	return nil
 }
 
+func (r httpRequest) getUrlWithPathParams() (string, error) {
+	urlTemplate, parseErr := uritemplates.Parse(r.pathTemplate)
+	if parseErr != nil {
+		logging.NewLoggerEntry().Error("Invalid path template. Unable to parse : ", parseErr)
+		return "", errors.New(fmt.Sprintf("Invalid path template"))
+	}
+
+	urlWithPathParams, expandErr := urlTemplate.Expand(r.pathParameters)
+	if expandErr != nil {
+		logging.NewLoggerEntry().Error("Unable to populate path params..", expandErr)
+		return "", errors.New(fmt.Sprintf("URL construction failed for path params"))
+	}
+
+	return urlWithPathParams, nil
+}
+
+func (r httpRequest) removeDoubleSlashesInUrl(url string) (string, error) {
+	var scheme string
+	if strings.HasPrefix(url, "https://") {
+		scheme = "https://"
+	} else if strings.HasPrefix(url, "http://") {
+		scheme = "http://"
+	} else {
+		return "", errors.New(fmt.Sprintf("Url scheme missing"))
+	}
+
+	urlPath := strings.TrimPrefix(url, scheme)
+	cleanUrlPath := strings.ReplaceAll(urlPath, "//", "/")
+
+	return scheme + cleanUrlPath, nil
+}
+
+func getStatusCode(response *http.Response) string {
+	statusCode := ""
+	if response == nil {
+		statusCode = "500"
+	} else {
+		statusCode = strconv.Itoa(response.StatusCode)
+	}
+	return statusCode
+}
+
 func addResponseTags(res *http.Response, span *openTrace.Span) {
 	span.AddAttributes(openTrace.Int64Attribute(ochttp.StatusCodeAttribute, int64(res.StatusCode)))
 	if res.StatusCode >= 400 {
@@ -413,20 +506,43 @@ func addResponseTags(res *http.Response, span *openTrace.Span) {
 func (r httpRequest) logHttpRequest(span *openTrace.Span, httpRequest *http.Request) *openTrace.Span {
 	logKeyName := "request"
 	logDescription := httpRequest.Host + httpRequest.URL.RequestURI()
-	_, dataSpan := openTrace.StartSpanWithRemoteParent(r.ctx, httpRequest.URL.RequestURI()+" | request/response", span.SpanContext())
+	var logRequest string
+
+	_, dataSpan := openTrace.StartSpanWithRemoteParent(r.ctx, r.extractPath()+" | request/response", span.SpanContext())
 
 	requestBodyBytes, readErr := ioutil.ReadAll(httpRequest.Body)
+	defer func() {
+		httpRequest.Body = ioutil.NopCloser(bytes.NewBuffer(requestBodyBytes))
+	}()
+
 	if readErr != nil {
-		dataSpan.Annotate([]openTrace.Attribute{
-			openTrace.StringAttribute(logKeyName, "Error reading request body: "+readErr.Error()),
-		}, logDescription)
+		logRequest = "Error reading request body: " + readErr.Error()
 	} else {
-		dataSpan.Annotate([]openTrace.Attribute{
-			openTrace.StringAttribute(logKeyName, string(requestBodyBytes)),
-		}, logDescription)
+		if r.requestTraceHook != nil {
+			if requestBody, err := r.requestTraceHook(requestBodyBytes); err == nil {
+				logRequest = requestBody
+			} else {
+				logRequest = string(requestBodyBytes)
+			}
+		} else {
+			logRequest = string(requestBodyBytes)
+		}
 	}
-	httpRequest.Body = ioutil.NopCloser(bytes.NewBuffer(requestBodyBytes))
+
+	dataSpan.Annotate([]openTrace.Attribute{
+		openTrace.StringAttribute(logKeyName, logRequest),
+	}, logDescription)
+
 	return dataSpan
+}
+
+func (r httpRequest) extractPath() string {
+	parsedURL, err := url.Parse(r.pathTemplate)
+	if err != nil {
+		logging.GetLogger(r.ctx).Warn("Error while parsing path template")
+		return r.pathTemplate
+	}
+	return parsedURL.Path
 }
 
 func isLoggingDisabled(requestedPath string) bool {
@@ -438,8 +554,16 @@ func (r httpRequest) logHttpResponse(respBody string, httpRequest *http.Request,
 	if dataSpan != nil {
 		logKeyName := "response"
 		logDescription := httpRequest.Host + httpRequest.URL.RequestURI()
+		responseBodyBytes := []byte(respBody)
+
+		if r.responseTraceHook != nil {
+			if responseBody, err := r.responseTraceHook(responseBodyBytes); err == nil {
+				responseBodyBytes = []byte(responseBody)
+			}
+		}
+
 		dataSpan.Annotate([]openTrace.Attribute{
-			openTrace.StringAttribute(logKeyName, respBody),
+			openTrace.StringAttribute(logKeyName, trace.EscapeSpecialChar(responseBodyBytes)),
 		}, logDescription)
 		dataSpan.End()
 	}
@@ -564,6 +688,11 @@ func (r httpRequest) validateResponse(obj interface{}) error {
 	return nil
 }
 
+func (r httpRequest) WithRequestBodyBytes(bytes []byte) HttpRequest {
+	r.requestBytes = bytes
+	return r
+}
+
 // Request builder
 type HttpRequestBuilder interface {
 	NewRequest() HttpRequest
@@ -581,8 +710,8 @@ func (rb requestBuilder) NewRequest() HttpRequest {
 		headers: map[string]string{
 			constants.X_REQUESTED_WITH_HEADER_KEY: constants.X_REQUESTED_WITH_HEADER_VALUE,
 		},
-		cookies: []*http.Cookie{},
-		trace:   trace.New(),
+		cookies:         []*http.Cookie{},
+		trace:           trace.New(),
 	}
 }
 
