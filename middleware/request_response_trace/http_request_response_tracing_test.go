@@ -3,6 +3,7 @@ package request_response_trace
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/suite"
 	"go.opencensus.io/plugin/ochttp"
@@ -86,6 +87,234 @@ func (suite *HttpRequestResponseMiddlewareTest) TestShouldAddRequestResponseAnno
 	suite.Nil(childSpan.Attributes["error"])
 }
 
+func (suite *HttpRequestResponseMiddlewareTest) TestShouldAddRequestResponseAnnotationsInNewChildSpanWithRequestResponseHooks() {
+	t := spanExporter{}
+	trace.RegisterExporter(&t)
+	url := "/api/transactions"
+	request := transactionsRequest{BatchSize: 20, PageNumber: 4}
+	response := []transactionsResponse{
+		{TransactionId: 111, TransactionType: "Transfer funds"},
+		{TransactionId: 454, TransactionType: "Send money"},
+	}
+
+	reqHook := func(*gin.Context, []byte) (string, error) {
+		marshall, _ := json.Marshal(request)
+		return string(marshall), nil
+	}
+
+	resHook := func(*gin.Context, []byte) (string, error) {
+		marshall, _ := json.Marshal(response)
+		return string(marshall), nil
+	}
+
+	suite.ginEngine.POST(url,
+		HttpRequestResponseTracingAllMiddlewareWithHooks(reqHook, resHook),
+		func(c *gin.Context) {
+			c.JSON(http.StatusOK, response)
+		})
+	requestBody, _ := json.Marshal(request)
+	responseBody, _ := json.Marshal(response)
+	r, _ := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
+	ctx, s := trace.StartSpan(r.Context(), "test-span", trace.WithSampler(trace.AlwaysSample()), trace.WithSpanKind(trace.SpanKindServer))
+
+	suite.ginEngine.ServeHTTP(suite.recorder, r.WithContext(ctx))
+
+	s.End()
+	suite.Len(t.spans, 2)
+	childSpan := t.spans[0]
+	suite.Equal(int64(http.StatusOK), childSpan.Attributes[ochttp.StatusCodeAttribute])
+	suite.Len(childSpan.Annotations, 2)
+
+	suite.Equal(url, childSpan.Annotations[0].Message)
+	suite.Equal(url, childSpan.Annotations[1].Message)
+
+	suite.Len(childSpan.Annotations[0].Attributes, 1)
+	suite.Len(childSpan.Annotations[1].Attributes, 1)
+
+	suite.Equal(string(requestBody), childSpan.Annotations[0].Attributes["request"])
+	suite.Equal(string(responseBody), childSpan.Annotations[1].Attributes["response"])
+
+	suite.Nil(childSpan.Attributes["error"])
+}
+
+func (suite *HttpRequestResponseMiddlewareTest) TestShouldAddRequestResponseAnnotationsInNewChildSpanWithOnlyResponseHooks() {
+	t := spanExporter{}
+	trace.RegisterExporter(&t)
+	url := "/api/transactions"
+	request := transactionsRequest{BatchSize: 20, PageNumber: 4}
+	response := []transactionsResponse{
+		{TransactionId: 111, TransactionType: "Transfer funds"},
+		{TransactionId: 454, TransactionType: "Send money"},
+	}
+
+	resHook := func(*gin.Context, []byte) (string, error) {
+		marshall, _ := json.Marshal(response)
+		return string(marshall), nil
+	}
+
+	suite.ginEngine.POST(url,
+		HttpRequestResponseTracingAllMiddlewareWithHooks(nil, resHook),
+		func(c *gin.Context) {
+			c.JSON(http.StatusOK, response)
+		})
+	requestBody, _ := json.Marshal(request)
+	responseBody, _ := json.Marshal(response)
+	r, _ := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
+	ctx, s := trace.StartSpan(r.Context(), "test-span", trace.WithSampler(trace.AlwaysSample()), trace.WithSpanKind(trace.SpanKindServer))
+
+	suite.ginEngine.ServeHTTP(suite.recorder, r.WithContext(ctx))
+
+	s.End()
+	suite.Len(t.spans, 2)
+	childSpan := t.spans[0]
+	suite.Equal(int64(http.StatusOK), childSpan.Attributes[ochttp.StatusCodeAttribute])
+	suite.Len(childSpan.Annotations, 2)
+
+	suite.Equal(url, childSpan.Annotations[0].Message)
+	suite.Equal(url, childSpan.Annotations[1].Message)
+
+	suite.Len(childSpan.Annotations[0].Attributes, 1)
+	suite.Len(childSpan.Annotations[1].Attributes, 1)
+
+	suite.Equal(string(requestBody), childSpan.Annotations[0].Attributes["request"])
+	suite.Equal(string(responseBody), childSpan.Annotations[1].Attributes["response"])
+
+	suite.Nil(childSpan.Attributes["error"])
+}
+
+func (suite *HttpRequestResponseMiddlewareTest) TestShouldAddRequestResponseAnnotationsInNewChildSpanWithResponseHookFailed() {
+	t := spanExporter{}
+	trace.RegisterExporter(&t)
+	url := "/api/transactions"
+	request := transactionsRequest{BatchSize: 20, PageNumber: 4}
+	response := []transactionsResponse{
+		{TransactionId: 111, TransactionType: "Transfer funds"},
+		{TransactionId: 454, TransactionType: "Send money"},
+	}
+
+	resHook := func(*gin.Context, []byte) (string, error) {
+		return "", errors.New("resHook failed")
+	}
+
+	suite.ginEngine.POST(url,
+		HttpRequestResponseTracingAllMiddlewareWithHooks(nil, resHook),
+		func(c *gin.Context) {
+			c.JSON(http.StatusOK, response)
+		})
+	requestBody, _ := json.Marshal(request)
+	responseBody, _ := json.Marshal(response)
+	r, _ := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
+	ctx, s := trace.StartSpan(r.Context(), "test-span", trace.WithSampler(trace.AlwaysSample()), trace.WithSpanKind(trace.SpanKindServer))
+
+	suite.ginEngine.ServeHTTP(suite.recorder, r.WithContext(ctx))
+
+	s.End()
+	suite.Len(t.spans, 2)
+	childSpan := t.spans[0]
+	suite.Equal(int64(http.StatusOK), childSpan.Attributes[ochttp.StatusCodeAttribute])
+	suite.Len(childSpan.Annotations, 2)
+
+	suite.Equal(url, childSpan.Annotations[0].Message)
+	suite.Equal(url, childSpan.Annotations[1].Message)
+
+	suite.Len(childSpan.Annotations[0].Attributes, 1)
+	suite.Len(childSpan.Annotations[1].Attributes, 1)
+
+	suite.Equal(string(requestBody), childSpan.Annotations[0].Attributes["request"])
+	suite.Equal(string(responseBody), childSpan.Annotations[1].Attributes["response"])
+
+	suite.Nil(childSpan.Attributes["error"])
+}
+
+func (suite *HttpRequestResponseMiddlewareTest) TestShouldAddRequestResponseAnnotationsInNewChildSpanWithOnlyRequestHooks() {
+	t := spanExporter{}
+	trace.RegisterExporter(&t)
+	url := "/api/transactions"
+	request := transactionsRequest{BatchSize: 20, PageNumber: 4}
+	response := []transactionsResponse{
+		{TransactionId: 111, TransactionType: "Transfer funds"},
+		{TransactionId: 454, TransactionType: "Send money"},
+	}
+
+	reqHook := func(*gin.Context, []byte) (string, error) {
+		marshall, _ := json.Marshal(request)
+		return string(marshall), nil
+	}
+
+	suite.ginEngine.POST(url,
+		HttpRequestResponseTracingAllMiddlewareWithHooks(reqHook, nil),
+		func(c *gin.Context) {
+			c.JSON(http.StatusOK, response)
+		})
+	requestBody, _ := json.Marshal(request)
+	responseBody, _ := json.Marshal(response)
+	r, _ := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
+	ctx, s := trace.StartSpan(r.Context(), "test-span", trace.WithSampler(trace.AlwaysSample()), trace.WithSpanKind(trace.SpanKindServer))
+
+	suite.ginEngine.ServeHTTP(suite.recorder, r.WithContext(ctx))
+
+	s.End()
+	suite.Len(t.spans, 2)
+	childSpan := t.spans[0]
+	suite.Equal(int64(http.StatusOK), childSpan.Attributes[ochttp.StatusCodeAttribute])
+	suite.Len(childSpan.Annotations, 2)
+
+	suite.Equal(url, childSpan.Annotations[0].Message)
+	suite.Equal(url, childSpan.Annotations[1].Message)
+
+	suite.Len(childSpan.Annotations[0].Attributes, 1)
+	suite.Len(childSpan.Annotations[1].Attributes, 1)
+
+	suite.Equal(string(requestBody), childSpan.Annotations[0].Attributes["request"])
+	suite.Equal(string(responseBody), childSpan.Annotations[1].Attributes["response"])
+
+	suite.Nil(childSpan.Attributes["error"])
+}
+
+func (suite *HttpRequestResponseMiddlewareTest) TestShouldAddRequestResponseAnnotationsInNewChildSpanWithRequestHookFailed() {
+	t := spanExporter{}
+	trace.RegisterExporter(&t)
+	url := "/api/transactions"
+	request := transactionsRequest{BatchSize: 20, PageNumber: 4}
+	response := []transactionsResponse{
+		{TransactionId: 111, TransactionType: "Transfer funds"},
+		{TransactionId: 454, TransactionType: "Send money"},
+	}
+
+	reqHook := func(*gin.Context, []byte) (string, error) {
+		return "", errors.New("req hook failed")
+	}
+
+	suite.ginEngine.POST(url,
+		HttpRequestResponseTracingAllMiddlewareWithHooks(reqHook, nil),
+		func(c *gin.Context) {
+			c.JSON(http.StatusOK, response)
+		})
+	requestBody, _ := json.Marshal(request)
+	responseBody, _ := json.Marshal(response)
+	r, _ := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
+	ctx, s := trace.StartSpan(r.Context(), "test-span", trace.WithSampler(trace.AlwaysSample()), trace.WithSpanKind(trace.SpanKindServer))
+
+	suite.ginEngine.ServeHTTP(suite.recorder, r.WithContext(ctx))
+
+	s.End()
+	suite.Len(t.spans, 2)
+	childSpan := t.spans[0]
+	suite.Equal(int64(http.StatusOK), childSpan.Attributes[ochttp.StatusCodeAttribute])
+	suite.Len(childSpan.Annotations, 2)
+
+	suite.Equal(url, childSpan.Annotations[0].Message)
+	suite.Equal(url, childSpan.Annotations[1].Message)
+
+	suite.Len(childSpan.Annotations[0].Attributes, 1)
+	suite.Len(childSpan.Annotations[1].Attributes, 1)
+
+	suite.Equal(string(requestBody), childSpan.Annotations[0].Attributes["request"])
+	suite.Equal(string(responseBody), childSpan.Annotations[1].Attributes["response"])
+
+	suite.Nil(childSpan.Attributes["error"])
+}
+
 func (suite *HttpRequestResponseMiddlewareTest) TestShouldAddNOBODYCONTENTAsRequestAnnotationIfRequestBodyIsEmpty() {
 	t := spanExporter{}
 	trace.RegisterExporter(&t)
@@ -119,6 +348,89 @@ func (suite *HttpRequestResponseMiddlewareTest) TestShouldAddNOBODYCONTENTAsRequ
 
 	suite.Equal("NO BODY CONTENT", childSpan.Annotations[0].Attributes["request"])
 	suite.Equal(string(responseBody), childSpan.Annotations[1].Attributes["response"])
+
+	suite.Nil(childSpan.Attributes["error"])
+}
+
+func (suite *HttpRequestResponseMiddlewareTest) TestShouldAddNOBODYCONTENTAsRequestAnnotationIfRequestBodyIsEmptyWithHooks() {
+	t := spanExporter{}
+	trace.RegisterExporter(&t)
+	url := "/api/transactions"
+	response := []transactionsResponse{
+		{TransactionId: 111, TransactionType: "Transfer funds"},
+		{TransactionId: 454, TransactionType: "Send money"},
+	}
+
+	reqHook := func(*gin.Context, []byte) (string, error) {
+		return "NO BODY CONTENT", nil
+	}
+
+	resHook := func(*gin.Context, []byte) (string, error) {
+		marshall, _ := json.Marshal(response)
+		return string(marshall), nil
+	}
+
+	suite.ginEngine.POST(url,
+		HttpRequestResponseTracingAllMiddlewareWithHooks(reqHook, resHook),
+		func(c *gin.Context) {
+			c.JSON(http.StatusOK, response)
+		})
+	responseBody, _ := json.Marshal(response)
+	r, _ := http.NewRequest("POST", url, nil)
+	ctx, s := trace.StartSpan(r.Context(), "test-span", trace.WithSampler(trace.AlwaysSample()), trace.WithSpanKind(trace.SpanKindServer))
+
+	suite.ginEngine.ServeHTTP(suite.recorder, r.WithContext(ctx))
+
+	s.End()
+	suite.Len(t.spans, 2)
+	childSpan := t.spans[0]
+	suite.Equal(int64(http.StatusOK), childSpan.Attributes[ochttp.StatusCodeAttribute])
+	suite.Len(childSpan.Annotations, 2)
+
+	suite.Equal(url, childSpan.Annotations[0].Message)
+	suite.Equal(url, childSpan.Annotations[1].Message)
+
+	suite.Len(childSpan.Annotations[0].Attributes, 1)
+	suite.Len(childSpan.Annotations[1].Attributes, 1)
+
+	suite.Equal("NO BODY CONTENT", childSpan.Annotations[0].Attributes["request"])
+	suite.Equal(string(responseBody), childSpan.Annotations[1].Attributes["response"])
+
+	suite.Nil(childSpan.Attributes["error"])
+}
+
+func (suite *HttpRequestResponseMiddlewareTest) TestShouldAddBase64EncodedTextAsResponseAnnotationIfResponseBodyContainsInvalidChars() {
+	t := spanExporter{}
+	trace.RegisterExporter(&t)
+	url := "/api/transactions"
+	request := transactionsRequest{BatchSize: 20, PageNumber: 4}
+	response := []byte{1, 128, 129, 200}
+	suite.ginEngine.POST(url,
+		HttpRequestResponseTracingAllMiddleware,
+		func(c *gin.Context) {
+			c.Data(http.StatusOK, "application/pdf", response)
+			c.Next()
+		})
+	requestBody, _ := json.Marshal(request)
+	r, _ := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
+	ctx, s := trace.StartSpan(r.Context(), "test-span", trace.WithSampler(trace.AlwaysSample()), trace.WithSpanKind(trace.SpanKindServer))
+
+	suite.ginEngine.ServeHTTP(suite.recorder, r.WithContext(ctx))
+
+	s.End()
+	suite.Len(t.spans, 2)
+	childSpan := t.spans[0]
+	suite.Equal(int64(http.StatusOK), childSpan.Attributes[ochttp.StatusCodeAttribute])
+	suite.Len(childSpan.Annotations, 2)
+
+	suite.Equal(url, childSpan.Annotations[0].Message)
+	suite.Equal(url, childSpan.Annotations[1].Message)
+
+	suite.Len(childSpan.Annotations[0].Attributes, 1)
+	suite.Len(childSpan.Annotations[1].Attributes, 1)
+
+	suite.Equal(string(requestBody), childSpan.Annotations[0].Attributes["request"])
+	suite.Equal("BASE64_ENCODED_CONTENT: AYCByA==", childSpan.Annotations[1].Attributes["response"])
 
 	suite.Nil(childSpan.Attributes["error"])
 }
@@ -200,6 +512,26 @@ func (suite *HttpRequestResponseMiddlewareTest) TestShouldExcludeTracingForHealt
 	suite.Len(t.spans, 1)
 }
 
+func (suite *HttpRequestResponseMiddlewareTest) TestShouldExcludeTracingForCustomHealthEndpoint() {
+	t := spanExporter{}
+	trace.RegisterExporter(&t)
+	healthEndpoint := "/api/v1/info"
+	request := transactionsRequest{BatchSize: 20, PageNumber: 4}
+	suite.ginEngine.GET(healthEndpoint,
+		HttpRequestResponseTracingAllMiddlewareWithCustomHealthEndpoint(healthEndpoint),
+		func(c *gin.Context) {
+			c.Status(http.StatusOK)
+		})
+	requestBody, _ := json.Marshal(request)
+	r, _ := http.NewRequest("GET", healthEndpoint, bytes.NewBuffer(requestBody))
+	ctx, s := trace.StartSpan(r.Context(), "test-span", trace.WithSampler(trace.AlwaysSample()), trace.WithSpanKind(trace.SpanKindServer))
+
+	suite.ginEngine.ServeHTTP(suite.recorder, r.WithContext(ctx))
+
+	s.End()
+	suite.Len(t.spans, 1)
+}
+
 func (suite *HttpRequestResponseMiddlewareTest) TestShouldNotLogRequestAndResponseByDefaultIfApiIsIncludedInIgnoredApisList() {
 	t := spanExporter{}
 	trace.RegisterExporter(&t)
@@ -214,7 +546,7 @@ func (suite *HttpRequestResponseMiddlewareTest) TestShouldNotLogRequestAndRespon
 		HttpRequestResponseTracingMiddleware([]IgnoreRequestResponseLogs{
 			{PartialApiPath: "TRANSACTIONS"},
 			{PartialApiPath: "filters"},
-		}),
+		}, "/healthz", nil, nil),
 		func(c *gin.Context) {
 			c.JSON(http.StatusOK, response)
 		})
@@ -243,7 +575,7 @@ func (suite *HttpRequestResponseMiddlewareTest) TestShouldLogRequestOnlyIfApiIsI
 		HttpRequestResponseTracingMiddleware([]IgnoreRequestResponseLogs{
 			{PartialApiPath: "transactionS", IsRequestLogAllowed: true},
 			{PartialApiPath: "filters"},
-		}),
+		}, "/healthz", nil, nil),
 		func(c *gin.Context) {
 			c.JSON(http.StatusOK, response)
 		})
@@ -272,7 +604,7 @@ func (suite *HttpRequestResponseMiddlewareTest) TestShouldLogResponseOnlyIfApiIs
 		HttpRequestResponseTracingMiddleware([]IgnoreRequestResponseLogs{
 			{PartialApiPath: "Transactions", IsResponseLogAllowed: true},
 			{PartialApiPath: "filters"},
-		}),
+		}, "/healthz", nil, nil),
 		func(c *gin.Context) {
 			c.JSON(http.StatusOK, response)
 		})

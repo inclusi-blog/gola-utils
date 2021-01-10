@@ -3,14 +3,14 @@ package request_response_trace
 import (
 	"bytes"
 	"context"
+	"io/ioutil"
+	"net/http"
+	"strings"
 	"github.com/gin-gonic/gin"
 	"github.com/gola-glitch/gola-utils/logging"
 	span "github.com/gola-glitch/gola-utils/trace"
 	"go.opencensus.io/plugin/ochttp"
 	"go.opencensus.io/trace"
-	"io/ioutil"
-	"net/http"
-	"strings"
 )
 
 const (
@@ -21,23 +21,33 @@ const (
 	RESPONSE_SEQURITY_MSG = "Response body not logged for security reasons"
 )
 
+type traceHookFunc func(*gin.Context, []byte) (string, error)
+
 func HttpRequestResponseTracingAllMiddleware(ctx *gin.Context) {
-	HttpRequestResponseTracingMiddleware(nil)(ctx)
+	HttpRequestResponseTracingMiddleware(nil, "/healthz", nil, nil)(ctx)
 }
 
-func HttpRequestResponseTracingMiddleware(apisToBeIgnored []IgnoreRequestResponseLogs) gin.HandlerFunc {
+func HttpRequestResponseTracingAllMiddlewareWithHooks(requestHook traceHookFunc, responseHook traceHookFunc) gin.HandlerFunc {
+	return HttpRequestResponseTracingMiddleware(nil, "/healthz", requestHook, responseHook)
+}
+
+func HttpRequestResponseTracingAllMiddlewareWithCustomHealthEndpoint(healthEndpoint string) gin.HandlerFunc {
+	return HttpRequestResponseTracingMiddleware(nil, healthEndpoint, nil, nil)
+}
+
+func HttpRequestResponseTracingMiddleware(apisToBeIgnored []IgnoreRequestResponseLogs, healthEndpoint string, requestHook traceHookFunc, responseHook traceHookFunc) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		logger := logging.GetLogger(ctx)
 		logger.Info("Initiating http request response tracing")
 		httpRequest := ctx.Request
 		requestURI := httpRequest.URL.RequestURI()
-		if !strings.Contains(requestURI, "/healthz") {
+		if !strings.Contains(requestURI, healthEndpoint) {
 			dataSpan := createNewSpan(ctx, httpRequest)
-			logHttpRequest(ctx, dataSpan, httpRequest, apisToBeIgnored)
+			logHttpRequest(ctx, dataSpan, httpRequest, apisToBeIgnored, requestHook)
 
 			responseWriter := addAndGetCustomResponseWriter(ctx)
 			defer func() {
-				logHttpResponse(ctx, dataSpan, responseWriter, apisToBeIgnored)
+				logHttpResponse(ctx, dataSpan, responseWriter, apisToBeIgnored, responseHook)
 				dataSpan.End()
 			}()
 		}
@@ -56,24 +66,36 @@ func createNewSpan(ctx context.Context, httpRequest *http.Request) *trace.Span {
 	return dataSpan
 }
 
-func logHttpRequest(ctx context.Context, dataSpan *trace.Span, httpRequest *http.Request, apisToBeIgnored []IgnoreRequestResponseLogs) {
+func logHttpRequest(ctx *gin.Context, dataSpan *trace.Span, httpRequest *http.Request, apisToBeIgnored []IgnoreRequestResponseLogs, requestHook traceHookFunc) {
+	logger := logging.GetLogger(ctx)
 	if !isRequestLogAllowed(httpRequest.URL.RequestURI(), apisToBeIgnored) {
-		logging.GetLogger(ctx).Debug("request payload for api is not allowed to log")
+		logger.Debug("request payload for api is not allowed to log")
 		addAnnotation(dataSpan, REQUEST_SEQURITY_MSG, REQUEST, httpRequest.URL.RequestURI())
 		return
 	}
-	var requestBody = "NO BODY CONTENT"
+	var requestBodyBytes = []byte(span.NO_BODY_CONTENT)
+	var readErr error
 	if httpRequest.Body != nil {
-		requestBodyBytes, readErr := ioutil.ReadAll(httpRequest.Body)
+		requestBodyBytes, readErr = ioutil.ReadAll(httpRequest.Body)
 		if readErr != nil {
-			logging.GetLogger(ctx).Errorf("Error occurred while reading request body. Error: %+v", readErr)
+			logger.Errorf("Error occurred while reading request body. Error: %+v", readErr)
 			return
 		}
 		httpRequest.Body = ioutil.NopCloser(bytes.NewBuffer(requestBodyBytes))
-		requestBody = string(requestBodyBytes)
 	}
-	addAnnotation(dataSpan, requestBody, REQUEST, httpRequest.URL.RequestURI())
-	logging.GetLogger(ctx).Debug("Added request payload in newly created span")
+	if requestHook != nil {
+		newRequestBody, err := requestHook(ctx, requestBodyBytes)
+		if err != nil {
+			logger.Debug("logHttpRequest: Request Hook function failed")
+			addAnnotation(dataSpan, span.EscapeSpecialChar(requestBodyBytes), REQUEST, httpRequest.URL.RequestURI())
+		} else {
+			logger.Debug("logHttpRequest: Added request payload in newly created span")
+			addAnnotation(dataSpan, span.EscapeSpecialChar([]byte(newRequestBody)), REQUEST, httpRequest.URL.RequestURI())
+		}
+	} else {
+		addAnnotation(dataSpan, span.EscapeSpecialChar(requestBodyBytes), REQUEST, httpRequest.URL.RequestURI())
+		logger.Debug("Added request payload in newly created span")
+	}
 }
 
 func addAndGetCustomResponseWriter(ctx *gin.Context) *responseBodyWriter {
@@ -82,19 +104,33 @@ func addAndGetCustomResponseWriter(ctx *gin.Context) *responseBodyWriter {
 	return responseWriter
 }
 
-func logHttpResponse(ctx *gin.Context, dataSpan *trace.Span, responseWriter *responseBodyWriter, apisToBeIgnored []IgnoreRequestResponseLogs) {
+func logHttpResponse(ctx *gin.Context, dataSpan *trace.Span, responseWriter *responseBodyWriter, apisToBeIgnored []IgnoreRequestResponseLogs, responseHook traceHookFunc) {
+	logger := logging.GetLogger(ctx)
 	if !isResponseLogAllowed(ctx.Request.URL.RequestURI(), apisToBeIgnored) {
-		logging.GetLogger(ctx).Debug("response for api is not allowed to log")
+		logger.Debug("response for api is not allowed to log")
 		addAnnotation(dataSpan, RESPONSE_SEQURITY_MSG, RESPONSE, ctx.Request.URL.RequestURI())
 		return
 	}
-	var responseBody = "NO BODY CONTENT"
-	if responseWriter.body != nil && responseWriter.body.Len() > 0 {
-		responseBody = responseWriter.body.String()
+
+	var requestBodyBytes = []byte(span.NO_BODY_CONTENT)
+	if responseWriter.body != nil {
+		requestBodyBytes = responseWriter.body.Bytes()
 	}
-	addAnnotation(dataSpan, responseBody, RESPONSE, ctx.Request.URL.RequestURI())
+
+	if responseHook != nil {
+		responseBodyFromHook, err := responseHook(ctx, requestBodyBytes)
+		if err != nil {
+			logger.Debug("logHttpResponse: Response Hook function failed")
+			addAnnotation(dataSpan, span.EscapeSpecialChar(requestBodyBytes), RESPONSE, ctx.Request.URL.RequestURI())
+		} else {
+			logger.Debug("logHttpResponse: Added response body in newly created span. Closing the span.")
+			addAnnotation(dataSpan, span.EscapeSpecialChar([]byte(responseBodyFromHook)), RESPONSE, ctx.Request.URL.RequestURI())
+		}
+	} else {
+		addAnnotation(dataSpan, span.EscapeSpecialChar(requestBodyBytes), RESPONSE, ctx.Request.URL.RequestURI())
+		logger.Debug("Added response body in newly created span. Closing the span.")
+	}
 	addResponseTags(responseWriter.Status(), dataSpan)
-	logging.GetLogger(ctx).Debug("Added response body in newly created span. Closing the span.")
 }
 
 func isRequestLogAllowed(requestURI string, apisToBeIgnored []IgnoreRequestResponseLogs) bool {
