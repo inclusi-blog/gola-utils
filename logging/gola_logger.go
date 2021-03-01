@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/gola-glitch/gola-utils/constants"
+	"github.com/neo4j/neo4j-go-driver/v4/neo4j/log"
 	"reflect"
 	"strings"
 
@@ -31,6 +32,7 @@ const (
 )
 
 type GolaLoggerEntry interface {
+	log.Logger
 	WithError(err error) *golaLoggerEntry
 	WithField(key string, value interface{}) *golaLoggerEntry
 	WithFields(fields GolaFields) *golaLoggerEntry
@@ -39,10 +41,7 @@ type GolaLoggerEntry interface {
 	SetLevel(lvl string) error
 
 	Tracef(format string, value ...interface{})
-	Debugf(format string, value ...interface{})
-	Infof(format string, value ...interface{})
 	Printf(format string, value ...interface{})
-	Warnf(format string, value ...interface{})
 	Warningf(format string, value ...interface{})
 	Errorf(format string, value ...interface{})
 	Fatalf(format string, value ...interface{})
@@ -54,7 +53,6 @@ type GolaLoggerEntry interface {
 	Print(value ...interface{})
 	Warn(value ...interface{})
 	Warning(value ...interface{})
-	Error(value ...interface{})
 	Fatal(value ...interface{})
 	Panic(value ...interface{})
 

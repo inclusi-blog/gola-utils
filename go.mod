@@ -16,6 +16,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway v1.14.7 // indirect
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/jtacoma/uritemplates v1.0.0
+	github.com/neo4j/neo4j-go-driver/v4 v4.2.3
 	github.com/sirupsen/logrus v1.6.0
 	github.com/stretchr/testify v1.4.0
 	go.opencensus.io v0.22.3
