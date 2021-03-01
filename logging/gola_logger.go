@@ -32,7 +32,6 @@ const (
 )
 
 type GolaLoggerEntry interface {
-	log.Logger
 	WithError(err error) *golaLoggerEntry
 	WithField(key string, value interface{}) *golaLoggerEntry
 	WithFields(fields GolaFields) *golaLoggerEntry
@@ -72,6 +71,7 @@ type GolaFields map[string]interface{}
 type GolaLoggerHook logrus.Hook
 
 type golaLoggerEntry struct {
+	log.Logger
 	context  context.Context
 	stdEntry *logrus.Entry
 	Data     GolaFields
