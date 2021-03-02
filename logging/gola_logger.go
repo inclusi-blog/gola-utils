@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/gola-glitch/gola-utils/constants"
-	"github.com/neo4j/neo4j-go-driver/v4/neo4j/log"
 	"reflect"
 	"strings"
 
@@ -71,7 +70,6 @@ type GolaFields map[string]interface{}
 type GolaLoggerHook logrus.Hook
 
 type golaLoggerEntry struct {
-	log.Logger
 	context  context.Context
 	stdEntry *logrus.Entry
 	Data     GolaFields
