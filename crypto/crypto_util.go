@@ -1,19 +1,19 @@
 package crypto
 
 import (
+	"context"
 	"errors"
-	"github.com/gin-gonic/gin"
 	"github.com/gola-glitch/gola-utils/constants"
 	"github.com/gola-glitch/gola-utils/http/request"
 	"github.com/gola-glitch/gola-utils/http/util"
 	"github.com/gola-glitch/gola-utils/model"
 )
 
-type CryptoUtil interface {
-	Decipher(ctx *gin.Context, encryptedText string) (string, error)
+type Util interface {
+	Decipher(ctx context.Context, encryptedText string) (string, error)
 }
 
-func NewCryptoUtil(cryptoServiceUrl string) CryptoUtil {
+func NewCryptoUtil(cryptoServiceUrl string) Util {
 	return cryptoUtil{
 		httpRequestBuilder: request.NewHttpRequestBuilder(util.GetHttpClientWithTracing()),
 		cryptoServiceUrl:   cryptoServiceUrl,
@@ -25,7 +25,7 @@ type cryptoUtil struct {
 	cryptoServiceUrl   string
 }
 
-func (utils cryptoUtil) Decipher(ctx *gin.Context, encryptedText string) (string, error) {
+func (utils cryptoUtil) Decipher(ctx context.Context, encryptedText string) (string, error) {
 	if encryptedText == "" {
 		return "", errors.New("text is empty")
 	}

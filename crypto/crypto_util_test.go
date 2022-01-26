@@ -15,7 +15,7 @@ type CryptoUtilTestSuite struct {
 	suite.Suite
 	recorder   *httptest.ResponseRecorder
 	context    *gin.Context
-	cryptoUtil CryptoUtil
+	cryptoUtil Util
 }
 
 func TestCryptoUtilTestSuite(t *testing.T) {
