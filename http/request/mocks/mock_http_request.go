@@ -6,8 +6,8 @@ package mocks
 
 import (
 	context "context"
-	request "github.com/gola-glitch/gola-utils/http/request"
-	trace "github.com/gola-glitch/gola-utils/trace"
+	request "github.com/inclusi-blog/gola-utils/http/request"
+	trace "github.com/inclusi-blog/gola-utils/trace"
 	gomock "github.com/golang/mock/gomock"
 	validator "gopkg.in/go-playground/validator.v9"
 	http "net/http"

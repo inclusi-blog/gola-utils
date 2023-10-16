@@ -4,8 +4,8 @@ package service
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/gola-glitch/gola-utils/logging"
-	"github.com/gola-glitch/gola-utils/middleware/introspection/oauth-middleware/http"
+	"github.com/inclusi-blog/gola-utils/logging"
+	"github.com/inclusi-blog/gola-utils/middleware/introspection/oauth-middleware/http"
 )
 
 type IntrospectionService interface {

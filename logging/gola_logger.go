@@ -3,7 +3,7 @@ package logging
 import (
 	"context"
 	"fmt"
-	"github.com/gola-glitch/gola-utils/constants"
+	"github.com/inclusi-blog/gola-utils/constants"
 	"reflect"
 	"strings"
 

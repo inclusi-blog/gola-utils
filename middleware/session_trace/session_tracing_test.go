@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gola-glitch/gola-utils/constants"
+	"github.com/inclusi-blog/gola-utils/constants"
 	"github.com/stretchr/testify/suite"
 	"go.opencensus.io/trace"
 )

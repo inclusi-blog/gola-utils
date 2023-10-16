@@ -2,11 +2,11 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/gola-glitch/gola-utils/constants"
-	"github.com/gola-glitch/gola-utils/http/util"
-	"github.com/gola-glitch/gola-utils/logging"
-	"github.com/gola-glitch/gola-utils/model"
-	"github.com/gola-glitch/gola-utils/oauth"
+	"github.com/inclusi-blog/gola-utils/constants"
+	"github.com/inclusi-blog/gola-utils/http/util"
+	"github.com/inclusi-blog/gola-utils/logging"
+	"github.com/inclusi-blog/gola-utils/model"
+	"github.com/inclusi-blog/gola-utils/oauth"
 	"net/http"
 )
 

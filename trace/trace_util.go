@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"github.com/gin-gonic/gin"
-	"github.com/gola-glitch/gola-utils/constants"
+	"github.com/inclusi-blog/gola-utils/constants"
 	"strings"
 )
 

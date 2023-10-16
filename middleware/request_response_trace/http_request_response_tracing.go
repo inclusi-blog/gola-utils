@@ -3,14 +3,14 @@ package request_response_trace
 import (
 	"bytes"
 	"context"
+	"github.com/gin-gonic/gin"
+	"github.com/inclusi-blog/gola-utils/logging"
+	span "github.com/inclusi-blog/gola-utils/trace"
+	"go.opencensus.io/plugin/ochttp"
+	"go.opencensus.io/trace"
 	"io/ioutil"
 	"net/http"
 	"strings"
-	"github.com/gin-gonic/gin"
-	"github.com/gola-glitch/gola-utils/logging"
-	span "github.com/gola-glitch/gola-utils/trace"
-	"go.opencensus.io/plugin/ochttp"
-	"go.opencensus.io/trace"
 )
 
 const (

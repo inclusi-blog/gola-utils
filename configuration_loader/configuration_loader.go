@@ -2,7 +2,7 @@ package configuration_loader
 
 import (
 	"encoding/json"
-	"github.com/gola-glitch/gola-utils/logging"
+	"github.com/inclusi-blog/gola-utils/logging"
 	"os"
 
 	"gopkg.in/go-playground/validator.v9"

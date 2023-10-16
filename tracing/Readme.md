@@ -10,7 +10,7 @@
 
 1. Initialise a exporter to export traces
 ```go 
-import "github.com/gola-glitch/gola-utils/http/request"
+import "github.com/inclusi-blog/gola-utils/http/request"
 
 tracing.Init("service-name", "collector-address")
 ```

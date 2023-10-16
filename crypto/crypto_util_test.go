@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/gola-glitch/gola-utils/model"
+	"github.com/inclusi-blog/gola-utils/model"
 	"github.com/stretchr/testify/suite"
 	"net/http"
 	"net/http/httptest"

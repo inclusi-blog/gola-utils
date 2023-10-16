@@ -9,7 +9,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"github.com/gola-glitch/gola-utils/http/util"
+	"github.com/inclusi-blog/gola-utils/http/util"
 	"github.com/jtacoma/uritemplates"
 	"io/ioutil"
 	"mime"
@@ -25,14 +25,14 @@ import (
 
 	"gopkg.in/go-playground/validator.v9"
 
-	"github.com/gola-glitch/gola-utils/http/model"
-	"github.com/gola-glitch/gola-utils/logging"
+	"github.com/inclusi-blog/gola-utils/http/model"
+	"github.com/inclusi-blog/gola-utils/logging"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gola-glitch/gola-utils/constants"
-	utilError "github.com/gola-glitch/gola-utils/golaerror"
-	"github.com/gola-glitch/gola-utils/http/client"
-	"github.com/gola-glitch/gola-utils/trace"
+	"github.com/inclusi-blog/gola-utils/constants"
+	utilError "github.com/inclusi-blog/gola-utils/golaerror"
+	"github.com/inclusi-blog/gola-utils/http/client"
+	"github.com/inclusi-blog/gola-utils/trace"
 	"go.opencensus.io/plugin/ochttp"
 	openTrace "go.opencensus.io/trace"
 )

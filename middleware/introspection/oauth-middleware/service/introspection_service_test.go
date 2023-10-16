@@ -2,8 +2,8 @@ package service
 
 import (
 	"github.com/gin-gonic/gin"
-	error2 "github.com/gola-glitch/gola-utils/middleware/introspection/oauth-middleware/error"
-	"github.com/gola-glitch/gola-utils/middleware/introspection/oauth-middleware/mocks"
+	error2 "github.com/inclusi-blog/gola-utils/middleware/introspection/oauth-middleware/error"
+	"github.com/inclusi-blog/gola-utils/middleware/introspection/oauth-middleware/mocks"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/suite"
 	"net/http"

@@ -6,7 +6,7 @@ package mocks
 
 import (
 	gin "github.com/gin-gonic/gin"
-	error "github.com/gola-glitch/gola-utils/middleware/introspection/oauth-middleware/error"
+	error "github.com/inclusi-blog/gola-utils/middleware/introspection/oauth-middleware/error"
 	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
 )

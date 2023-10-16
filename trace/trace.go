@@ -4,7 +4,7 @@ package trace
 
 import (
 	"context"
-	"github.com/gola-glitch/gola-utils/constants"
+	"github.com/inclusi-blog/gola-utils/constants"
 	"net/http"
 	"net/http/httptrace"
 

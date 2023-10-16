@@ -3,8 +3,8 @@ package email
 import (
 	"context"
 	"encoding/json"
-	"github.com/gola-glitch/gola-utils/alert/email/models"
-	"github.com/gola-glitch/gola-utils/golaerror"
+	"github.com/inclusi-blog/gola-utils/alert/email/models"
+	"github.com/inclusi-blog/gola-utils/golaerror"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/h2non/gock.v1"

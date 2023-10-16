@@ -4,12 +4,12 @@ package http
 import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
-	"github.com/gola-glitch/gola-utils/golaerror"
-	"github.com/gola-glitch/gola-utils/http/request"
-	"github.com/gola-glitch/gola-utils/http/util"
-	"github.com/gola-glitch/gola-utils/logging"
-	middlewareError "github.com/gola-glitch/gola-utils/middleware/introspection/oauth-middleware/error"
-	"github.com/gola-glitch/gola-utils/middleware/introspection/oauth-middleware/model"
+	"github.com/inclusi-blog/gola-utils/golaerror"
+	"github.com/inclusi-blog/gola-utils/http/request"
+	"github.com/inclusi-blog/gola-utils/http/util"
+	"github.com/inclusi-blog/gola-utils/logging"
+	middlewareError "github.com/inclusi-blog/gola-utils/middleware/introspection/oauth-middleware/error"
+	"github.com/inclusi-blog/gola-utils/middleware/introspection/oauth-middleware/model"
 	"net/http"
 )
 

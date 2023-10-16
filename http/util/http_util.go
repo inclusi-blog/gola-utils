@@ -3,8 +3,8 @@ package util
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/gola-glitch/gola-utils/constants"
-	"github.com/gola-glitch/gola-utils/logging"
+	"github.com/inclusi-blog/gola-utils/constants"
+	"github.com/inclusi-blog/gola-utils/logging"
 	"go.opencensus.io/plugin/ochttp"
 	"net"
 	"net/http"

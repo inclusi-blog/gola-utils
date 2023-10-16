@@ -7,7 +7,7 @@ package mocks
 import (
 	context "context"
 	gin "github.com/gin-gonic/gin"
-	model "github.com/gola-glitch/gola-utils/model"
+	model "github.com/inclusi-blog/gola-utils/model"
 	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
 )

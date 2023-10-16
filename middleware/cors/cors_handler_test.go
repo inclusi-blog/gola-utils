@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/gola-glitch/gola-utils/model"
+	"github.com/inclusi-blog/gola-utils/model"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/suite"
 	gohttp "net/http"

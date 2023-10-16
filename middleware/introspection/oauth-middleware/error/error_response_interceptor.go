@@ -4,7 +4,7 @@ package error
 
 import (
 	"github.com/gin-gonic/gin"
-	loggingUtil "github.com/gola-glitch/gola-utils/logging"
+	loggingUtil "github.com/inclusi-blog/gola-utils/logging"
 )
 
 type ResponseInterceptor interface {

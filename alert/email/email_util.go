@@ -6,10 +6,10 @@ import (
 	"encoding/base64"
 	"net/http"
 
-	"github.com/gola-glitch/gola-utils/alert/email/models"
-	"github.com/gola-glitch/gola-utils/golaerror"
-	"github.com/gola-glitch/gola-utils/http/request"
-	"github.com/gola-glitch/gola-utils/logging"
+	"github.com/inclusi-blog/gola-utils/alert/email/models"
+	"github.com/inclusi-blog/gola-utils/golaerror"
+	"github.com/inclusi-blog/gola-utils/http/request"
+	"github.com/inclusi-blog/gola-utils/logging"
 	"go.opencensus.io/plugin/ochttp"
 )
 

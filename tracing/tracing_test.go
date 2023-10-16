@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/gola-glitch/gola-utils/model"
+	"github.com/inclusi-blog/gola-utils/model"
 	"github.com/stretchr/testify/suite"
 	"testing"
 )

@@ -4,12 +4,12 @@ package service
 
 import (
 	"github.com/gin-gonic/gin"
-	errorUtils "github.com/gola-glitch/gola-utils/golang_error"
-	"github.com/gola-glitch/gola-utils/http/util"
-	loggingUtil "github.com/gola-glitch/gola-utils/logging"
-	"github.com/gola-glitch/gola-utils/middleware/introspection/oauth-middleware/constants"
-	error2 "github.com/gola-glitch/gola-utils/middleware/introspection/oauth-middleware/error"
-	"github.com/gola-glitch/gola-utils/oauth"
+	errorUtils "github.com/inclusi-blog/gola-utils/golang_error"
+	"github.com/inclusi-blog/gola-utils/http/util"
+	loggingUtil "github.com/inclusi-blog/gola-utils/logging"
+	"github.com/inclusi-blog/gola-utils/middleware/introspection/oauth-middleware/constants"
+	error2 "github.com/inclusi-blog/gola-utils/middleware/introspection/oauth-middleware/error"
+	"github.com/inclusi-blog/gola-utils/oauth"
 )
 
 type TokenService interface {

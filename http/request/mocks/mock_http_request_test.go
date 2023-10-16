@@ -1,7 +1,7 @@
 package mocks
 
 import (
-	"github.com/gola-glitch/gola-utils/http/request"
+	"github.com/inclusi-blog/gola-utils/http/request"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/suite"
 	"testing"

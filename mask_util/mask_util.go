@@ -2,7 +2,7 @@ package mask_util
 
 import (
 	"context"
-	"github.com/gola-glitch/gola-utils/logging"
+	"github.com/inclusi-blog/gola-utils/logging"
 	"strings"
 )
 

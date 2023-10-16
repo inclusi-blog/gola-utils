@@ -3,9 +3,9 @@ package middleware
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/gola-glitch/gola-utils/constants"
-	"github.com/gola-glitch/gola-utils/mocks"
-	"github.com/gola-glitch/gola-utils/model"
+	"github.com/inclusi-blog/gola-utils/constants"
+	"github.com/inclusi-blog/gola-utils/mocks"
+	"github.com/inclusi-blog/gola-utils/model"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"

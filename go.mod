@@ -1,4 +1,4 @@
-module github.com/gola-glitch/gola-utils
+module github.com/inclusi-blog/gola-utils
 
 go 1.13
 

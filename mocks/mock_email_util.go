@@ -6,8 +6,8 @@ package mocks
 
 import (
 	context "context"
-	models "github.com/gola-glitch/gola-utils/alert/email/models"
-	golaerror "github.com/gola-glitch/gola-utils/golaerror"
+	models "github.com/inclusi-blog/gola-utils/alert/email/models"
+	golaerror "github.com/inclusi-blog/gola-utils/golaerror"
 	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
 )
