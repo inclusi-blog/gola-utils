@@ -6,7 +6,7 @@ permissions:
 jobs:
   golang-ci:
     name: lint
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-go@v3
         with:
@@ -25,7 +25,7 @@ jobs:
           version: latest
   semgrep:
     name: semgrep
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     container:
       image: returntocorp/semgrep
     steps:
@@ -33,7 +33,7 @@ jobs:
       - run: semgrep --config=auto .
   unit-test:
     name: unit-test
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-go@v3
         with:
@@ -61,7 +61,7 @@ jobs:
           fi
           echo "Download coverage.out and execute `go tool cover -html=coverage.out`"
   create-tag:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     needs: unit-test
     if: github.ref == 'refs/heads/master'
     steps:
