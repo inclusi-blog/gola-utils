@@ -26,7 +26,7 @@ func (suite *RedisStoreTestSuite) SetupTest() {
 		panic(err)
 	}
 	suite.ctx = context.Background()
-	suite.redisClient, err = NewRedisClient(suite.mockRedis.Host(), suite.mockRedis.Port(), 0, 10, 10, 10)
+	suite.redisClient, err = NewRedisClient(suite.mockRedis.Host(), suite.mockRedis.Port(), 0, 10, 10, 10, "")
 	suite.Nil(err)
 }
 

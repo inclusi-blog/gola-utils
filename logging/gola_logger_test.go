@@ -91,6 +91,7 @@ func (suite *GolaLoggerTestSuite) TestShouldSetWithContextSuccessfully() {
 	suite.Equal(context.Background(), golaLoggerEntry.context)
 	golaLoggerEntry = golaLoggerEntry.WithContext(context.TODO())
 	suite.Equal(context.TODO(), golaLoggerEntry.context)
+	expectedLogrusEntry.Context = context.TODO()
 	suite.Equal(expectedLogrusEntry, golaLoggerEntry.stdEntry)
 	suite.Equal(0, len(golaLoggerEntry.Data))
 	suite.Equal("", golaLoggerEntry.err)
@@ -114,7 +115,7 @@ func (suite *GolaLoggerTestSuite) TestShouldSetPanicLevelSuccessfully() {
 	err := golaLoggerEntry.SetLevel("panic")
 
 	suite.Nil(err)
-	suite.Equal(context.TODO(), golaLoggerEntry.context)
+	suite.Equal(context.Background(), golaLoggerEntry.context)
 	suite.Equal(logrus.PanicLevel, golaLoggerEntry.stdEntry.Logger.Level)
 	suite.Equal(expectedLogrusEntry, golaLoggerEntry.stdEntry)
 	suite.Equal(0, len(golaLoggerEntry.Data))
@@ -127,7 +128,7 @@ func (suite *GolaLoggerTestSuite) TestShouldSetFatalLevelSuccessfully() {
 	err := golaLoggerEntry.SetLevel("Fatal")
 
 	suite.Nil(err)
-	suite.Equal(context.TODO(), golaLoggerEntry.context)
+	suite.Equal(context.Background(), golaLoggerEntry.context)
 	suite.Equal(logrus.FatalLevel, golaLoggerEntry.stdEntry.Logger.Level)
 	suite.Equal(expectedLogrusEntry, golaLoggerEntry.stdEntry)
 	suite.Equal(0, len(golaLoggerEntry.Data))
@@ -140,7 +141,7 @@ func (suite *GolaLoggerTestSuite) TestShouldSetErrorLevelSuccessfully() {
 	err := golaLoggerEntry.SetLevel("ERROR")
 
 	suite.Nil(err)
-	suite.Equal(context.TODO(), golaLoggerEntry.context)
+	suite.Equal(context.Background(), golaLoggerEntry.context)
 	suite.Equal(logrus.ErrorLevel, golaLoggerEntry.stdEntry.Logger.Level)
 	suite.Equal(expectedLogrusEntry, golaLoggerEntry.stdEntry)
 	suite.Equal(0, len(golaLoggerEntry.Data))
@@ -153,7 +154,7 @@ func (suite *GolaLoggerTestSuite) TestShouldSetWarnLevelSuccessfully() {
 	err := golaLoggerEntry.SetLevel("warn")
 
 	suite.Nil(err)
-	suite.Equal(context.TODO(), golaLoggerEntry.context)
+	suite.Equal(context.Background(), golaLoggerEntry.context)
 	suite.Equal(logrus.WarnLevel, golaLoggerEntry.stdEntry.Logger.Level)
 	suite.Equal(expectedLogrusEntry, golaLoggerEntry.stdEntry)
 	suite.Equal(0, len(golaLoggerEntry.Data))
@@ -166,7 +167,7 @@ func (suite *GolaLoggerTestSuite) TestShouldSetWarningLevelSuccessfully() {
 	err := golaLoggerEntry.SetLevel("warning")
 
 	suite.Nil(err)
-	suite.Equal(context.TODO(), golaLoggerEntry.context)
+	suite.Equal(context.Background(), golaLoggerEntry.context)
 	suite.Equal(logrus.WarnLevel, golaLoggerEntry.stdEntry.Logger.Level)
 	suite.Equal(expectedLogrusEntry, golaLoggerEntry.stdEntry)
 	suite.Equal(0, len(golaLoggerEntry.Data))
@@ -179,7 +180,7 @@ func (suite *GolaLoggerTestSuite) TestShouldSetInfoLevelSuccessfully() {
 	err := golaLoggerEntry.SetLevel("info")
 
 	suite.Nil(err)
-	suite.Equal(context.TODO(), golaLoggerEntry.context)
+	suite.Equal(context.Background(), golaLoggerEntry.context)
 	suite.Equal(logrus.InfoLevel, golaLoggerEntry.stdEntry.Logger.Level)
 	suite.Equal(expectedLogrusEntry, golaLoggerEntry.stdEntry)
 	suite.Equal(0, len(golaLoggerEntry.Data))
@@ -192,7 +193,7 @@ func (suite *GolaLoggerTestSuite) TestShouldSetPrintLevelSuccessfully() {
 	err := golaLoggerEntry.SetLevel("print")
 
 	suite.Nil(err)
-	suite.Equal(context.TODO(), golaLoggerEntry.context)
+	suite.Equal(context.Background(), golaLoggerEntry.context)
 	suite.Equal(logrus.InfoLevel, golaLoggerEntry.stdEntry.Logger.Level)
 	suite.Equal(expectedLogrusEntry, golaLoggerEntry.stdEntry)
 	suite.Equal(0, len(golaLoggerEntry.Data))
@@ -205,7 +206,7 @@ func (suite *GolaLoggerTestSuite) TestShouldSetDebugLevelSuccessfully() {
 	err := golaLoggerEntry.SetLevel("DEBUG")
 
 	suite.Nil(err)
-	suite.Equal(context.TODO(), golaLoggerEntry.context)
+	suite.Equal(context.Background(), golaLoggerEntry.context)
 	suite.Equal(logrus.DebugLevel, golaLoggerEntry.stdEntry.Logger.Level)
 	suite.Equal(expectedLogrusEntry, golaLoggerEntry.stdEntry)
 	suite.Equal(0, len(golaLoggerEntry.Data))
@@ -218,7 +219,7 @@ func (suite *GolaLoggerTestSuite) TestShouldSetTraceLevelSuccessfully() {
 	err := golaLoggerEntry.SetLevel("traCe")
 
 	suite.Nil(err)
-	suite.Equal(context.TODO(), golaLoggerEntry.context)
+	suite.Equal(context.Background(), golaLoggerEntry.context)
 	suite.Equal(logrus.TraceLevel, golaLoggerEntry.stdEntry.Logger.Level)
 	suite.Equal(expectedLogrusEntry, golaLoggerEntry.stdEntry)
 	suite.Equal(0, len(golaLoggerEntry.Data))
