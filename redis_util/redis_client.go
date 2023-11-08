@@ -8,7 +8,6 @@ import (
 	"github.com/inclusi-blog/gola-utils/constants"
 	"github.com/inclusi-blog/gola-utils/logging"
 	"go.opencensus.io/trace"
-	"os"
 	"time"
 )
 
@@ -17,14 +16,14 @@ type redisStore struct {
 	rdb *redis.Client
 }
 
-func NewRedisClient(host string, port string, db int, readTimeout int, dialTimeout int, writeTimeout int) (RedisStore, error) {
+func NewRedisClient(host string, port string, db int, readTimeout int, dialTimeout int, writeTimeout int, password string) (RedisStore, error) {
 	rdb := redis.NewClient(&redis.Options{
 		Addr:         host + ":" + port,
 		DB:           db,
 		DialTimeout:  time.Duration(dialTimeout) * time.Second,
 		ReadTimeout:  time.Duration(readTimeout) * time.Second,
 		WriteTimeout: time.Duration(writeTimeout) * time.Second,
-		Password:     os.Getenv("REDIS_PASSWORD"),
+		Password:     password,
 	})
 	return redisStore{rdb: rdb}, rdb.Ping().Err()
 }
@@ -36,7 +35,7 @@ func NewRedisClientWith(config RedisStoreConfig) (RedisStore, error) {
 		DialTimeout:  time.Duration(config.DialTimeoutInSeconds) * time.Second,
 		ReadTimeout:  time.Duration(config.ReadTimeoutInSeconds) * time.Second,
 		WriteTimeout: time.Duration(config.WriteTimeoutInSeconds) * time.Second,
-		Password:     os.Getenv("REDIS_PASSWORD"),
+		Password:     config.Password,
 	})
 	return redisStore{rdb: rdb}, rdb.Ping().Err()
 }
