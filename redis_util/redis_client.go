@@ -8,10 +8,11 @@ import (
 	"github.com/inclusi-blog/gola-utils/constants"
 	"github.com/inclusi-blog/gola-utils/logging"
 	"go.opencensus.io/trace"
+	"os"
 	"time"
 )
 
-//TODO: Remove standalone client once cluster has been deployed in all envs
+// TODO: Remove standalone client once cluster has been deployed in all envs
 type redisStore struct {
 	rdb *redis.Client
 }
@@ -23,6 +24,7 @@ func NewRedisClient(host string, port string, db int, readTimeout int, dialTimeo
 		DialTimeout:  time.Duration(dialTimeout) * time.Second,
 		ReadTimeout:  time.Duration(readTimeout) * time.Second,
 		WriteTimeout: time.Duration(writeTimeout) * time.Second,
+		Password:     os.Getenv("REDIS_PASSWORD"),
 	})
 	return redisStore{rdb: rdb}, rdb.Ping().Err()
 }
@@ -34,6 +36,7 @@ func NewRedisClientWith(config RedisStoreConfig) (RedisStore, error) {
 		DialTimeout:  time.Duration(config.DialTimeoutInSeconds) * time.Second,
 		ReadTimeout:  time.Duration(config.ReadTimeoutInSeconds) * time.Second,
 		WriteTimeout: time.Duration(config.WriteTimeoutInSeconds) * time.Second,
+		Password:     os.Getenv("REDIS_PASSWORD"),
 	})
 	return redisStore{rdb: rdb}, rdb.Ping().Err()
 }
