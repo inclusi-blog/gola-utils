@@ -26,7 +26,7 @@ func (suite IntrospectionRequestBuilderTest) TestIntrospectionRequestBuilderShou
 	suite.Nil(error)
 	suite.Equal("application/x-www-form-urlencoded", request.Header.Get("Content-Type"))
 	suite.Equal("application/json", request.Header.Get("Accept"))
-	suite.Equal("admin_url/oauth2/introspect", request.URL.Path)
+	suite.Equal("admin_url/admin/oauth2/introspect", request.URL.Path)
 	suite.Equal("POST", request.Method)
 	bytes, error := ioutil.ReadAll(request.Body)
 	expectedBodyString := fmt.Sprintf("token=%s", url.QueryEscape("my_tok##@en"))

@@ -3,6 +3,7 @@ package middleware
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/golang/mock/gomock"
 	"github.com/inclusi-blog/gola-utils/constants"
 	"github.com/inclusi-blog/gola-utils/golaerror"
 	"github.com/inclusi-blog/gola-utils/http/request"
@@ -14,7 +15,6 @@ import (
 	"github.com/inclusi-blog/gola-utils/middleware/introspection/oauth-middleware/service"
 	mocks2 "github.com/inclusi-blog/gola-utils/mocks"
 	model2 "github.com/inclusi-blog/gola-utils/model"
-	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/suite"
 	"io/ioutil"
 	gohttp "net/http"
@@ -100,7 +100,7 @@ func (suite IntrospectionMiddlewareTest) TestIntrospectionMiddlewareShouldReturn
 	suite.mockHttpRequest.EXPECT().AddHeader("Accept", "application/json").Return(suite.mockHttpRequest)
 	suite.mockHttpRequest.EXPECT().WithFormURLEncoded(introspectionRequest).Return(suite.mockHttpRequest)
 	suite.mockHttpRequest.EXPECT().ResponseAs(&introspectionResponse).Return(suite.mockHttpRequest)
-	suite.mockHttpRequest.EXPECT().Post("hydra_base_admin_url/oauth2/introspect").Return(httpError)
+	suite.mockHttpRequest.EXPECT().Post("hydra_base_admin_url/admin/oauth2/introspect").Return(httpError)
 
 	suite.errorRessponseInterceptor.EXPECT().HandleServiceError(gomock.Any(), error2.InvalidAccessTokenError)
 
@@ -131,7 +131,7 @@ func (suite IntrospectionMiddlewareTest) TestIntrospectionMiddlewareShouldReturn
 		*tempResponsePointer = expectedIntrospectionResponse
 		return suite.mockHttpRequest
 	})
-	suite.mockHttpRequest.EXPECT().Post("hydra_base_admin_url/oauth2/introspect").Return(nil)
+	suite.mockHttpRequest.EXPECT().Post("hydra_base_admin_url/admin/oauth2/introspect").Return(nil)
 
 	w := suite.setupServerAndServe(req, gohttp.Client{})
 	suite.Equal(200, w.Code)
@@ -157,7 +157,7 @@ func (suite IntrospectionMiddlewareTest) TestIntrospectionMiddlewareShouldReturn
 	suite.mockHttpRequest.EXPECT().AddHeader("Accept", "application/json").Return(suite.mockHttpRequest)
 	suite.mockHttpRequest.EXPECT().WithFormURLEncoded(introspectionRequest).Return(suite.mockHttpRequest)
 	suite.mockHttpRequest.EXPECT().ResponseAs(&introspectionResponse).Return(suite.mockHttpRequest)
-	suite.mockHttpRequest.EXPECT().Post("hydra_base_admin_url/oauth2/introspect").Return(httpError)
+	suite.mockHttpRequest.EXPECT().Post("hydra_base_admin_url/admin/oauth2/introspect").Return(httpError)
 	suite.errorRessponseInterceptor.EXPECT().HandleServiceError(gomock.Any(), error2.InternalServerErrorFunc("Internal error in Hydra"))
 
 	suite.setupServerAndServe(req, gohttp.Client{})
@@ -181,7 +181,7 @@ func (suite IntrospectionMiddlewareTest) TestIntrospectionMiddlewareShouldReturn
 	suite.mockHttpRequest.EXPECT().AddHeader("Accept", "application/json").Return(suite.mockHttpRequest)
 	suite.mockHttpRequest.EXPECT().WithFormURLEncoded(introspectionRequest).Return(suite.mockHttpRequest)
 	suite.mockHttpRequest.EXPECT().ResponseAs(&introspectionResponse).Return(suite.mockHttpRequest)
-	suite.mockHttpRequest.EXPECT().Post("hydra_base_admin_url/oauth2/introspect").Return(httpError)
+	suite.mockHttpRequest.EXPECT().Post("hydra_base_admin_url/admin/oauth2/introspect").Return(httpError)
 
 	suite.errorRessponseInterceptor.EXPECT().HandleServiceError(gomock.Any(), error2.InternalServerErrorFunc("Internal error in Hydra"))
 
@@ -214,7 +214,7 @@ func (suite IntrospectionMiddlewareTest) TestIntrospectionMiddlewareShouldReturn
 		return suite.mockHttpRequest
 	})
 
-	suite.mockHttpRequest.EXPECT().Post("hydra_base_admin_url/oauth2/introspect").Return(nil)
+	suite.mockHttpRequest.EXPECT().Post("hydra_base_admin_url/admin/oauth2/introspect").Return(nil)
 
 	suite.oauthUtils.EXPECT().DecodeEncryptedIdToken(gomock.Any()).Return(model2.IdToken{}, nil)
 
@@ -248,7 +248,7 @@ func (suite IntrospectionMiddlewareTest) TestIntrospectionMiddlewareShouldReturn
 		return suite.mockHttpRequest
 	})
 
-	suite.mockHttpRequest.EXPECT().Post("hydra_base_admin_url/oauth2/introspect").Return(nil)
+	suite.mockHttpRequest.EXPECT().Post("hydra_base_admin_url/admin/oauth2/introspect").Return(nil)
 	suite.oauthUtils.EXPECT().DecodeEncryptedIdToken(gomock.Any()).Times(0)
 
 	r := suite.setupGinServerForDecryption(req, gohttp.Client{})
@@ -283,7 +283,7 @@ func (suite IntrospectionMiddlewareTest) TestIntrospectionMiddlewareShouldHandle
 		return suite.mockHttpRequest
 	})
 
-	suite.mockHttpRequest.EXPECT().Post("hydra_base_admin_url/oauth2/introspect").Return(nil)
+	suite.mockHttpRequest.EXPECT().Post("hydra_base_admin_url/admin/oauth2/introspect").Return(nil)
 
 	suite.oauthUtils.EXPECT().DecodeEncryptedIdToken(gomock.Any()).Return(model2.IdToken{}, errors.New("decryption error"))
 	suite.errorRessponseInterceptor.EXPECT().HandleServiceError(gomock.Any(), error2.InvalidIdTokenError)
