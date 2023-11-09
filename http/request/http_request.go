@@ -12,6 +12,7 @@ import (
 	"github.com/inclusi-blog/gola-utils/http/util"
 	"github.com/jtacoma/uritemplates"
 	"io/ioutil"
+	"log"
 	"mime"
 	"mime/multipart"
 	"net/http"
@@ -395,7 +396,9 @@ func (r httpRequest) makeRequest(method string) error {
 	}
 	start := time.Now()
 
+	log.Printf("Making the request %s", httpRequest.URL.String())
 	response, httpError := r.httpClient.Do(httpRequest)
+	log.Printf("After the request %s", httpRequest.URL.String())
 
 	_ = time.Since(start)
 
@@ -710,8 +713,8 @@ func (rb requestBuilder) NewRequest() HttpRequest {
 		headers: map[string]string{
 			constants.X_REQUESTED_WITH_HEADER_KEY: constants.X_REQUESTED_WITH_HEADER_VALUE,
 		},
-		cookies:         []*http.Cookie{},
-		trace:           trace.New(),
+		cookies: []*http.Cookie{},
+		trace:   trace.New(),
 	}
 }
 
