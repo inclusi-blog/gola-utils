@@ -29,7 +29,7 @@ func (introspectionRequestBuilder introspectionRequestBuilder) Build(hydraAdminB
 	data := url.Values{}
 	data.Set("token", accessToken)
 
-	introspectionUrl := fmt.Sprintf("%s/oauth2/introspect", hydraAdminBaseUrl)
+	introspectionUrl := fmt.Sprintf("%s/admin/oauth2/introspect", hydraAdminBaseUrl)
 	request, requestError := http.NewRequest("POST", introspectionUrl, strings.NewReader(data.Encode()))
 	if requestError != nil {
 		return nil, requestError
